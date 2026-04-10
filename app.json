@@ -2,6 +2,17 @@
   "expo": {
     "name": "FitTrackMobile",
     "slug": "FitTrackMobile",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lokeshchoudhary.fittrack"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "scheme": "fittrack"
   }
 }

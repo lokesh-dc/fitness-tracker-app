@@ -13,6 +13,9 @@
       "expo-router",
       "expo-secure-store"
     ],
-    "scheme": "fittrack"
+    "scheme": "fittrack",
+    "android": {
+      "package": "com.lokeshchoudhary.fittrack"
+    }
   }
 }

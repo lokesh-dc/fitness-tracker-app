@@ -1,4 +1,4 @@
-package com.fittrackmobile
+package com.lokeshchoudhary.fittrack
 
 import android.app.Application
 import android.content.res.Configuration

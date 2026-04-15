@@ -12,7 +12,7 @@ export interface PlanExercise {
 }
 
 export interface PlanDay {
-  dayOfWeek: number       // 0 = Monday … 6 = Sunday (matches web app)
+  dayOfWeek: number  
   name: string            // e.g. "Push", "Pull", "Legs"
   exercises: PlanExercise[]
 }

@@ -1,12 +1,11 @@
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import { PlanDay } from '@/types/plan'
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-// dayOfWeek: 0 = Monday … 6 = Sunday
+// dayOfWeek: 0 = Sunday … 6 = Saturday
 function getTodayIndex(): number {
-  const jsDay = new Date().getDay()   // 0 = Sunday in JS
-  return jsDay === 0 ? 6 : jsDay - 1  // convert to 0 = Monday
+  return new Date().getDay()   // 0 = Sunday in JS
 }
 
 interface Props {

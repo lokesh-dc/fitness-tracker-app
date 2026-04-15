@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.lokeshchoudhary.fittrack'
+    namespace 'com.lokeshchoudhary.fittrackmobile'
     defaultConfig {
-        applicationId 'com.lokeshchoudhary.fittrack'
+        applicationId 'com.lokeshchoudhary.fittrackmobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

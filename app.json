@@ -7,7 +7,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lokeshchoudhary.fittrack"
+      "bundleIdentifier": "com.lokeshchoudhary.fittrackmobile"
     },
     "plugins": [
       "expo-router",
@@ -15,7 +15,13 @@
     ],
     "scheme": "fittrack",
     "android": {
-      "package": "com.lokeshchoudhary.fittrack"
+      "package": "com.lokeshchoudhary.fittrackmobile"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "80023296-30ac-41d4-a83f-7890df1b705f"
+      }
     }
   }
 }

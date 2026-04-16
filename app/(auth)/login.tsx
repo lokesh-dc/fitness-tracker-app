@@ -28,7 +28,6 @@ export default function LoginScreen() {
 		setIsLoading(true);
 		try {
 			const data = await login(email.trim().toLowerCase(), password);
-			console.log({ data });
 			router.replace("/(tabs)/");
 		} catch (e: any) {
 			setError(e.message ?? "Sign in failed. Check your credentials.");

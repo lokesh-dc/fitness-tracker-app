@@ -196,7 +196,7 @@ export function WorkoutScreen({ mode, initialExercises = [], sessionName = 'Work
       >
 
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4 py-3">
+        <View className="flex-row items-center justify-[between px-4 py-3">
           <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
             <Text className="text-white/50 text-base">← Back</Text>
           </TouchableOpacity>

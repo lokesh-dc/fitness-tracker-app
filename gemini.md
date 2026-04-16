@@ -20,7 +20,17 @@
 - **TypeScript**: Use strict typing. Define interfaces for API responses and component props. Avoid `any`.
 
 ## 4. Assistant Workflow
-- **Small Commits/Changes**: Break down large features into manageable chunks.
+- **Small Commits/Changes**: Break down large features into manageable chunks. **Change Control**: If a task involves modifying more than 2 components, the assistant MUST create an implementation plan detailing the approach and rationale, then wait for explicit user sign-off before execution.
 - **Preserve Context**: Always read existing code (especially in `src/` and `app/`) before implementing new features to ensure consistency.
 - **Console Logs**: Remove all `console.log` statements before finalizing a feature.
 - **Build Verification**: Ensure changes don't break the Expo dev server or cause linting errors.
+
+## 5. Integration with Backend (fitness-tracker)
+
+This application is the mobile companion to the **fitness-tracker** web project (located at `../fitness-tracker`).
+
+- **API Source**: This app consumes the API endpoints defined in the web project. All API changes must be coordinated with the backend schemas.
+- **Shared Logic**: 
+  - **Sunday-start**: Both platforms MUST use a Sunday-start week convention.
+  - **PR Definitions**: PR logic is managed on the backend but visualized here. Refer to the web project's core logic for accuracy.
+- **Access Permissions**: The assistant is explicitly granted permission to read and reference the `../fitness-tracker` project at any time for API and logic alignment.

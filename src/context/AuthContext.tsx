@@ -54,7 +54,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				body: JSON.stringify({ email, password }),
 			},
 		);
-		console.log({ data });
 		await SecureStore.setItemAsync(TOKEN_KEY, data.token);
 		setToken(data.token);
 		setUser(data.user);

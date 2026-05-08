@@ -1,49 +1,29 @@
 export type WorkoutMode = 'LIVE_SESSION' | 'MANUAL_LOG'
 
-export type WarmupScheme = 'STRENGTH' | 'STRENGTH_HYPER' | 'HYPERTROPHY' | 'ENDURANCE'
-
-export interface WarmupSet {
-  percentage: number
-  reps: number
-  weight: number   // calculated from working weight
-  isWarmup: true
+export interface SetEntry {
+  weight: string
+  reps: string
+  done: boolean
 }
 
-export interface WorkingSet {
-  weight: number
-  reps: number
-  isDone: boolean
-  isWarmup?: false
-}
-
-export interface Exercise {
+export interface SessionExercise {
   exerciseId: string
   name: string
-  muscleGroup?: string
+  muscleGroup: string
   targetSets: number
   targetReps: number
-  restDuration: number   // seconds, default 90
-  lastWeight: number
-  unit: 'kg' | 'lbs'
-  pr: boolean            // true if any set in this session beats the PR
-  sets: WorkingSet[]
+  lastWeight: number    // pre-filled from last session, 0 if new
+  currentPR: number     // from ExerciseRecords
+  unit: 'kg' | 'lb'
   isDone: boolean
+  sets: SetEntry[]
 }
 
 export interface WorkoutSession {
-  name: string
-  splitName?: string
-  date: string           // ISO date string YYYY-MM-DD
-  bodyWeight?: number
-  exercises: Exercise[]
-  startedAt?: string     // ISO timestamp, LIVE_SESSION only
-  completedAt?: string
-  durationSeconds?: number
+  workoutName: string
+  splitName: string
+  bodyWeight: number | null
+  exercises: SessionExercise[]
+  startedAt: Date | null
   mode: WorkoutMode
-}
-
-export interface ExerciseMaster {
-  _id: string
-  name: string
-  muscleGroup: string
 }

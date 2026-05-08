@@ -1,5 +1,4 @@
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000'
-console.log({ BASE_URL })
 
 export async function apiFetch<T>(
   path: string,

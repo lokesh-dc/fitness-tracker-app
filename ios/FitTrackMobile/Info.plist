@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>fittrack</string>
-          <string>com.lokeshchoudhary.fittrack</string>
+          <string>com.lokesh.ft.test</string>
         </array>
       </dict>
     </array>

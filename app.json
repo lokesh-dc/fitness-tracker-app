@@ -7,7 +7,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lokeshchoudhary.fittrackmobile"
+      "bundleIdentifier": "com.lokesh.ft.test"
     },
     "plugins": [
       "expo-router",

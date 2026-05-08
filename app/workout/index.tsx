@@ -1,0 +1,147 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useAuth } from '../../src/context/AuthContext';
+import { apiFetch } from '../../src/lib/api';
+import { WorkoutFlow } from '../../src/components/workout/WorkoutFlow';
+import { SessionExercise, WorkoutMode } from '../../src/types/workout';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+interface WorkoutSetupResponse {
+  lastLog: any | null;
+  activePlan: any | null;
+  exerciseRecords: any[];
+  userUnit: 'kg' | 'lb';
+  lastBodyWeight: number | null;
+}
+
+export default function WorkoutScreen() {
+  const { token } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [setupData, setSetupData] = useState<WorkoutSetupResponse | null>(null);
+  const [exercises, setExercises] = useState<SessionExercise[]>([]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await apiFetch<WorkoutSetupResponse>('/api/workout/setup', { token: token || undefined });
+      setSetupData(data);
+      
+      let sessionExercises: SessionExercise[] = [];
+
+      // 1. Determine base exercises
+      const jsDay = new Date().getDay();
+      const promptDay = (jsDay + 6) % 7; // Map JS 0=Sun to Prompt 6=Sun, JS 1=Mon to Prompt 0=Mon
+      
+      const templates = data.activePlan?.templates || [];
+      const todayTemplate = templates.find((t: any) => t.dayOfWeek === jsDay) || // Try matching backend jsDay first
+                            templates.find((t: any) => t.dayOfWeek === promptDay); // Fallback to prompt mapping
+      
+      const lastLog = data.lastLog;
+      const records = data.exerciseRecords;
+
+      if (todayTemplate && todayTemplate.exercises?.length > 0) {
+        sessionExercises = todayTemplate.exercises.map((ex: any) => {
+          const lastEx = lastLog?.exercises?.find((le: any) => le.exerciseId === ex.exerciseId);
+          const record = records.find((r: any) => r.exerciseName === ex.name || r.exerciseId === ex.exerciseId);
+          
+          return {
+            exerciseId: ex.exerciseId,
+            name: ex.name,
+            muscleGroup: ex.muscleGroup || 'General',
+            targetSets: ex.targetSets || 3,
+            targetReps: ex.targetReps || 10,
+            lastWeight: lastEx?.sets?.[0]?.weight || 0,
+            currentPR: record?.weight || 0,
+            unit: data.userUnit,
+            isDone: false,
+            sets: lastEx?.sets?.map((s: any) => ({
+              weight: s.weight.toString(),
+              reps: s.reps.toString(),
+              done: false
+            })) || Array.from({ length: ex.targetSets || 3 }).map(() => ({ weight: '', reps: '', done: false }))
+          };
+        });
+      } else if (lastLog && lastLog.exercises?.length > 0) {
+        sessionExercises = lastLog.exercises.map((ex: any) => {
+          const record = records.find((r: any) => r.exerciseName === ex.name || r.exerciseId === ex.exerciseId);
+          return {
+            exerciseId: ex.exerciseId,
+            name: ex.name,
+            muscleGroup: ex.muscleGroup || 'General',
+            targetSets: ex.sets?.length || 3,
+            targetReps: ex.sets?.[0]?.reps || 10,
+            lastWeight: ex.sets?.[0]?.weight || 0,
+            currentPR: record?.weight || 0,
+            unit: data.userUnit,
+            isDone: false,
+            sets: ex.sets?.map((s: any) => ({
+              weight: s.weight.toString(),
+              reps: s.reps.toString(),
+              done: false
+            }))
+          };
+        });
+      } else {
+        sessionExercises = [{
+          exerciseId: 'new-1',
+          name: 'New Exercise',
+          muscleGroup: 'General',
+          targetSets: 3,
+          targetReps: 10,
+          lastWeight: 0,
+          currentPR: 0,
+          unit: data.userUnit,
+          isDone: false,
+          sets: [{ weight: '', reps: '', done: false }]
+        }];
+      }
+
+      setExercises(sessionExercises);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch workout data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-[#0a0a0a] items-center justify-center">
+        <ActivityIndicator size="large" color="#f97316" />
+        <Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[10px]">Preparing Session</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-[#0a0a0a] items-center justify-center px-6">
+        <Text className="text-red-500 text-center mb-6 font-medium">{error}</Text>
+        <TouchableOpacity 
+          onPress={fetchData}
+          className="bg-orange-500 px-8 py-3 rounded-2xl"
+        >
+          <Text className="text-white font-bold">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-[#0a0a0a]" edges={['top']}>
+      <WorkoutFlow 
+        initialExercises={exercises}
+        lastBodyWeight={setupData?.lastBodyWeight || null}
+        workoutName={setupData?.activePlan?.todayTemplate?.splitName || setupData?.activePlan?.name || 'Quick Workout'}
+        unit={setupData?.userUnit || 'kg'}
+        mode="LIVE_SESSION"
+      />
+    </SafeAreaView>
+  );
+}

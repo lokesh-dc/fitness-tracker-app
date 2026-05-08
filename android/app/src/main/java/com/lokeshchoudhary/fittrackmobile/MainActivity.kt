@@ -1,4 +1,4 @@
-package com.lokeshchoudhary.fittrack
+package com.lokeshchoudhary.fittrackmobile
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -11,7 +11,11 @@ import {
 import { StickyBottomBar } from '../shared/StickyBottomBar';
 import { StepIndicator } from '../shared/StepIndicator';
 import { SessionExercise, SetEntry } from '../../../types/workout';
-import { Feather } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { WarmupBottomSheet } from '../WarmupBottomSheet';
+import { RestTimerBar } from '../RestTimerBar';
+import { useRestTimer } from '../../../hooks/useRestTimer';
 
 interface ExerciseLogStepProps {
   exercise: SessionExercise;
@@ -24,14 +28,23 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
   onSave,
   handleBack,
 }) => {
-  const [sets, setSets] = React.useState<SetEntry[]>(
+  const [sets, setSets] = useState<SetEntry[]>(
     exercise.sets.length > 0 ? exercise.sets : [{ weight: '', reps: '', done: false }]
   );
+  const [warmupVisible, setWarmupVisible] = useState(false);
+  const { isActive, secondsRemaining, totalSeconds, startTimer, skipTimer, adjustTimer } = useRestTimer();
 
   const handleUpdateSet = (index: number, field: keyof SetEntry, value: string | boolean) => {
     const newSets = [...sets];
+    const isMarkingDone = field === 'done' && value === true;
+
     newSets[index] = { ...newSets[index], [field]: value };
     setSets(newSets);
+
+    if (isMarkingDone) {
+      const restDuration = exercise.restDuration ?? 90;
+      startTimer(restDuration);
+    }
   };
 
   const addSet = () => {
@@ -69,17 +82,30 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
         
         <View className="flex-row items-center justify-between mb-6">
           <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
-            <Feather name="chevron-left" color="white" size={24} />
+            <Ionicons name="chevron-back" color="white" size={28} />
           </TouchableOpacity>
           
           <View className="items-center flex-1 pr-8">
             <Text className="text-white font-bold text-xl text-center">
               {exercise.name}
             </Text>
-            <View className="px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 mt-1">
-              <Text className="text-orange-500 text-[10px] font-bold uppercase tracking-wider">
-                {exercise.muscleGroup}
-              </Text>
+            <View className="flex-row items-center gap-x-2 mt-1">
+              <View className="px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20">
+                <Text className="text-orange-500 text-[10px] font-bold uppercase tracking-wider">
+                  {exercise.muscleGroup}
+                </Text>
+              </View>
+              {exercise.lastWeight > 0 && (
+                <TouchableOpacity 
+                  onPress={() => setWarmupVisible(true)}
+                  className="px-2 py-0.5 rounded-full bg-white/5 border border-orange-500/30 flex-row items-center"
+                >
+                  <Text className="text-orange-500 text-[10px] font-bold uppercase tracking-wider mr-1">
+                    Warmup Sets
+                  </Text>
+                  <Feather name="external-link" size={8} color="#f97316" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -102,7 +128,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 
       <ScrollView 
         className="flex-1 px-6"
-        contentContainerStyle={{ pb: 150 }}
+        contentContainerStyle={{ paddingBottom: 150 }}
       >
         <View className="flex-row mb-4 px-2">
           <Text className="w-10 text-white/40 text-[10px] font-black uppercase tracking-widest">#</Text>
@@ -145,7 +171,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
                 set.done ? 'bg-orange-500 border-orange-500' : 'border-white/20'
               }`}
             >
-              {set.done && <Feather name="check" size={20} color="white" />}
+              {set.done && <Ionicons name="checkmark" size={24} color="white" />}
             </TouchableOpacity>
           </View>
         ))}
@@ -153,23 +179,38 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
         <View className="flex-row gap-x-4 mt-4">
           <TouchableOpacity 
             onPress={addSet}
-            className="flex-1 py-3 rounded-xl border border-orange-500/30 bg-orange-500/5 items-center flex-row justify-center"
+            className="flex-1 py-3 rounded-xl border border-orange-500/30 bg-orange-500/5 items-center flex-row justify-center gap-x-2"
           >
-            <Feather name="plus" size={16} color="#f97316" className="mr-2" />
+            <Feather name="plus" size={16} color="#f97316" />
             <Text className="text-orange-500 font-bold text-sm">Add Set</Text>
           </TouchableOpacity>
 
           {sets.length > 1 && (
             <TouchableOpacity 
               onPress={removeSet}
-              className="flex-1 py-3 rounded-xl border border-red-500/30 bg-red-500/5 items-center flex-row justify-center"
+              className="flex-1 py-3 rounded-xl border border-red-500/30 bg-red-500/5 items-center flex-row justify-center gap-x-2"
             >
-              <Feather name="minus" size={16} color="#ef4444" className="mr-2" />
+              <Feather name="minus" size={16} color="#ef4444" />
               <Text className="text-red-500 font-bold text-sm">Remove Set</Text>
             </TouchableOpacity>
           )}
         </View>
       </ScrollView>
+
+      {isActive && (
+        <RestTimerBar
+          secondsRemaining={secondsRemaining}
+          totalSeconds={totalSeconds}
+          onSkip={skipTimer}
+          onAdjust={adjustTimer}
+        />
+      )}
+
+      <WarmupBottomSheet
+        visible={warmupVisible}
+        onClose={() => setWarmupVisible(false)}
+        exercise={exercise}
+      />
 
       <StickyBottomBar
         primaryLabel="Save Exercise ✓"

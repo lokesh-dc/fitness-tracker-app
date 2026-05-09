@@ -1,45 +1,92 @@
-import { useEffect, useRef, useState } from 'react'
-import { View, Text, TouchableOpacity, Animated } from 'react-native'
-import { useRestTimer } from '@/hooks/useRestTimer'
+import React from 'react';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-interface Props {
-  restTimer: ReturnType<typeof useRestTimer>
+interface RestTimerBarProps {
+  secondsRemaining: number;
+  totalSeconds: number;
+  onSkip: () => void;
+  onAdjust: (delta: number) => void;
 }
 
-export function RestTimerBar({ restTimer }: Props) {
-  const { secondsLeft, isRunning, progress, skip } = restTimer
-  const [widthAnim] = useState(() => new Animated.Value(1))
+export const RestTimerBar: React.FC<RestTimerBarProps> = ({
+  secondsRemaining,
+  totalSeconds,
+  onSkip,
+  onAdjust,
+}) => {
+  const insets = useSafeAreaInsets();
+  const slideAnim = React.useRef(new Animated.Value(200)).current;
 
-  useEffect(() => {
-    Animated.timing(widthAnim, {
-      toValue: progress,
-      duration: 400,
-      useNativeDriver: false,
-    }).start()
-  }, [progress])
+  React.useEffect(() => {
+    Animated.spring(slideAnim, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 40,
+      friction: 8,
+    }).start();
+  }, []);
 
-  if (!isRunning) return null
+  const formatDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const progress = totalSeconds > 0 ? (secondsRemaining / totalSeconds) * 100 : 0;
 
   return (
-    <View className="mx-4 mb-3 bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-      {/* Progress bar */}
-      <Animated.View
-        className="absolute left-0 top-0 bottom-0 bg-primary/30"
-        style={{ width: widthAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) }}
-      />
-      <View className="flex-row items-center justify-between px-4 py-3">
-        <View>
-          <Text className="text-white/50 text-xs mb-0.5">Rest timer</Text>
-          <Text className="text-white text-lg font-medium">{secondsLeft}s</Text>
+    <Animated.View 
+      className="absolute bottom-0 left-0 right-0 bg-[#0a0a0a]/95 border-t border-white/10 px-6 pt-5 pb-8 z-50"
+      style={{ 
+        transform: [{ translateY: slideAnim }],
+        paddingBottom: insets.bottom + 12 
+      }}
+    >
+      <View className="items-center mb-6">
+        <Text className={`text-4xl font-black mb-4 ${secondsRemaining <= 10 ? 'text-red-500' : 'text-white'}`}>
+          {formatDuration(secondsRemaining)}
+        </Text>
+        
+        {/* Fallback Linear Progress Bar */}
+        <View className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <View 
+            className="h-full bg-orange-500 rounded-full" 
+            style={{ width: `${progress}%` }} 
+          />
         </View>
-        <TouchableOpacity
-          onPress={skip}
-          activeOpacity={0.7}
-          className="bg-white/10 rounded-lg px-3 py-2"
+
+        <Text className="text-white/40 text-[11px] mt-3 font-bold uppercase tracking-widest">
+          Resting • {totalSeconds}s Total
+        </Text>
+      </View>
+
+      <View className="flex-row items-center justify-between">
+        <TouchableOpacity 
+          onPress={() => onAdjust(-15)}
+          className="bg-white/5 border border-white/10 px-4 py-2 rounded-full flex-row items-center"
         >
-          <Text className="text-white/70 text-sm">Skip</Text>
+          <Ionicons name="remove-circle-outline" size={14} color="rgba(255,255,255,0.6)" className="mr-1" />
+          <Text className="text-white/60 text-xs font-bold">15s</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={onSkip}
+          className="px-6 py-2 flex-row items-center"
+        >
+          <Text className="text-orange-500 text-sm font-bold uppercase tracking-wider mr-1">Skip</Text>
+          <Ionicons name="play-forward" size={14} color="#f97316" />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => onAdjust(15)}
+          className="bg-white/5 border border-white/10 px-4 py-2 rounded-full flex-row items-center"
+        >
+          <Text className="text-white/60 text-xs font-bold mr-1">15s</Text>
+          <Ionicons name="add-circle-outline" size={14} color="rgba(255,255,255,0.6)" />
         </TouchableOpacity>
       </View>
-    </View>
-  )
-}
+    </Animated.View>
+  );
+};

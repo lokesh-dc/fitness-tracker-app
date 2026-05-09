@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { StickyBottomBar } from '../shared/StickyBottomBar';
 import { StepIndicator } from '../shared/StepIndicator';
 import { ExerciseRowCard } from '../shared/ExerciseRowCard';
@@ -38,7 +39,7 @@ export const ExerciseOverviewStep: React.FC<ExerciseOverviewStepProps> = ({
       <View className="px-6 pt-4">
         <View className="flex-row items-center justify-between mb-2">
           <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
-            <Feather name="chevron-left" color="white" size={24} />
+            <Ionicons name="chevron-back" color="white" size={28} />
           </TouchableOpacity>
           <StepIndicator currentStep={1} />
           <View className="w-10" />
@@ -89,7 +90,7 @@ export const ExerciseOverviewStep: React.FC<ExerciseOverviewStepProps> = ({
               {isLive ? 'Live Session' : 'Manual Log'}
             </Text>
             <View className={`w-10 h-5 rounded-full px-1 justify-center ${isLive ? 'bg-orange-500' : 'bg-white/10'}`}>
-              <View className={`w-3 h-3 rounded-full bg-white transition-all ${isLive ? 'self-end' : 'self-start'}`} />
+              <View className={`w-3 h-3 rounded-full bg-white ${isLive ? 'self-end' : 'self-start'}`} />
             </View>
           </View>
         </TouchableOpacity>

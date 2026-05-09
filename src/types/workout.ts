@@ -15,8 +15,9 @@ export interface SessionExercise {
   lastWeight: number    // pre-filled from last session, 0 if new
   currentPR: number     // from ExerciseRecords
   unit: 'kg' | 'lb'
-  isDone: boolean
-  sets: SetEntry[]
+  isDone: boolean;
+  sets: SetEntry[];
+  restDuration?: number; // seconds
 }
 
 export interface WorkoutSession {

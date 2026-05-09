@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SessionExercise } from '../../../types/workout';
-import { Feather } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface ExerciseRowCardProps {
   exercise: SessionExercise;
@@ -62,13 +63,13 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
                 className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center"
               >
                 <Text className="text-white font-bold text-xs mr-1">Start</Text>
-                <Feather name="chevron-right" size={14} color="white" />
+                <Ionicons name="chevron-forward" size={14} color="white" />
               </TouchableOpacity>
             )}
 
             {isDone && (
               <View className="bg-green-500/20 p-2 rounded-full border border-green-500/30">
-                <Feather name="check-circle" size={18} color="#22c55e" />
+                <Ionicons name="checkmark-circle" size={18} color="#22c55e" />
               </View>
             )}
           </View>

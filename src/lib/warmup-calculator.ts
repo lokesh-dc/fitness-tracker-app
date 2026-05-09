@@ -1,36 +1,61 @@
-import { WarmupSet, WarmupScheme } from '@/types/workout'
+export type WarmupScheme = 'STRENGTH' | 'STRENGTH_HYPER' | 'HYPERTROPHY' | 'ENDURANCE'
 
-interface WarmupSchemeConfig {
-  sets: { percentage: number; reps: number }[]
+export interface WarmupSet {
+  setNumber: number
+  percentage: number      // e.g. 0.4 for 40%
+  weight: number          // rounded to nearest 2.5
+  reps: number
 }
 
-const SCHEMES: Record<WarmupScheme, WarmupSchemeConfig> = {
-  STRENGTH:       { sets: [{ percentage: 30, reps: 5 }, { percentage: 50, reps: 3 }, { percentage: 70, reps: 2 }, { percentage: 90, reps: 1 }] },
-  STRENGTH_HYPER: { sets: [{ percentage: 40, reps: 8 }, { percentage: 60, reps: 5 }, { percentage: 80, reps: 3 }] },
-  HYPERTROPHY:    { sets: [{ percentage: 50, reps: 10 }, { percentage: 75, reps: 6 }] },
-  ENDURANCE:      { sets: [{ percentage: 60, reps: 12 }] },
-}
-
-function getScheme(targetReps: number): WarmupScheme {
-  if (targetReps <= 5)  return 'STRENGTH'
-  if (targetReps <= 10) return 'STRENGTH_HYPER'
-  if (targetReps <= 15) return 'HYPERTROPHY'
-  return 'ENDURANCE'
+export interface WarmupResult {
+  scheme: WarmupScheme
+  sets: WarmupSet[]
 }
 
 export function generateWarmupSets(
   workingWeight: number,
   targetReps: number,
-  unit: 'kg' | 'lbs'
-): WarmupSet[] {
-  if (workingWeight <= 0) return []
-  const scheme = getScheme(targetReps)
-  const config = SCHEMES[scheme]
-  const step = unit === 'kg' ? 2.5 : 5
+  unit: 'kg' | 'lb'
+): WarmupResult {
+  let scheme: WarmupScheme = 'STRENGTH_HYPER'
+  let percentages: number[] = []
+  let repsPerSet = 5
 
-  return config.sets.map(({ percentage, reps }) => {
-    const raw = workingWeight * (percentage / 100)
-    const rounded = Math.round(raw / step) * step
-    return { percentage, reps, weight: Math.max(rounded, step), isWarmup: true }
-  })
+  if (targetReps <= 5) {
+    scheme = 'STRENGTH'
+    percentages = [0.3, 0.5, 0.7, 0.9]
+    repsPerSet = 5
+  } else if (targetReps <= 10) {
+    scheme = 'STRENGTH_HYPER'
+    percentages = [0.4, 0.6, 0.8]
+    repsPerSet = 5
+  } else if (targetReps <= 15) {
+    scheme = 'HYPERTROPHY'
+    percentages = [0.5, 0.75]
+    repsPerSet = 8
+  } else {
+    scheme = 'ENDURANCE'
+    percentages = [0.6]
+    repsPerSet = 10
+  }
+
+  if (workingWeight <= 0) {
+    return { scheme, sets: [] }
+  }
+
+  const sets: WarmupSet[] = percentages
+    .map((pct, index) => {
+      const rawWeight = workingWeight * pct
+      const roundedWeight = Math.round(rawWeight / 2.5) * 2.5
+      
+      return {
+        setNumber: index + 1,
+        percentage: pct,
+        weight: roundedWeight,
+        reps: repsPerSet
+      }
+    })
+    .filter(set => set.weight > 0)
+
+  return { scheme, sets }
 }

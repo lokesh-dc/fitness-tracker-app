@@ -6,6 +6,27 @@ export interface SetEntry {
   done: boolean
 }
 
+export interface PlateauSessionEntry {
+  date: string        // ISO date string
+  maxWeight: number
+  maxReps: number
+}
+
+export interface PlateauInfo {
+  isPlateaued: boolean
+  history: PlateauSessionEntry[]   // up to 5 most recent sessions
+}
+
+export interface PRHit {
+  exerciseId: string
+  exerciseName: string
+  type: 'WEIGHT' | 'REPS'
+  newValue: number        // new max weight or new max reps
+  previousValue: number  // what was beaten
+  setWeight: number       // the actual set weight (for display)
+  setReps: number         // the actual set reps (for display)
+}
+
 export interface SessionExercise {
   exerciseId: string
   name: string
@@ -18,6 +39,8 @@ export interface SessionExercise {
   isDone: boolean;
   sets: SetEntry[];
   restDuration?: number; // seconds
+  currentPRReps: number        // max reps at current PR weight, 0 if no PR
+  plateauInfo: PlateauInfo | null
 }
 
 export interface WorkoutSession {

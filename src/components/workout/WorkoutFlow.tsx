@@ -1,11 +1,12 @@
+// Force cache invalidate
 import React, { useState, useRef, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
-import { SessionExercise, WorkoutMode } from '../../types/workout';
+import { SessionExercise, WorkoutMode, PlateauInfo, PRHit } from '../../types/workout';
 import { BodyWeightStep } from './steps/BodyWeightStep';
 import { ExerciseOverviewStep } from './steps/ExerciseOverviewStep';
 import { ExerciseListStep } from './steps/ExerciseListStep';
 import { ExerciseLogStep } from './steps/ExerciseLogStep';
-import { CompletionModal } from './CompletionModal';
+import { WorkoutCompleteScreen } from './WorkoutCompleteScreen';
 import { apiFetch } from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
 import { router } from 'expo-router';
@@ -16,6 +17,7 @@ interface WorkoutFlowProps {
   workoutName: string;
   unit: 'kg' | 'lb';
   mode: WorkoutMode;
+  plateauData: Record<string, PlateauInfo>;
 }
 
 export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
@@ -24,17 +26,23 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
   workoutName,
   unit,
   mode,
+  plateauData,
 }) => {
   const { token } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [bodyWeight, setBodyWeight] = useState('');
   const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
-  const [exercises, setExercises] = useState<SessionExercise[]>(initialExercises);
+  const [exercises, setExercises] = useState<SessionExercise[]>(
+    initialExercises.map(ex => ({
+      ...ex,
+      plateauInfo: plateauData?.[ex.exerciseId?.toString()] ?? null,
+    }))
+  );
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [isLive, setIsLive] = useState(mode === 'LIVE_SESSION');
-  const [showCompletion, setShowCompletion] = useState(false);
+  const [sessionPRs, setSessionPRs] = useState<PRHit[]>([]);
+  const [showCompleteScreen, setShowCompleteScreen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [completionStats, setCompletionStats] = useState({ volume: 0, duration: 0, prs: [] as string[] });
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -51,10 +59,14 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
     }
   };
 
-  const handleUpdateExercise = (updatedExercise: SessionExercise) => {
+  const handleExerciseSaved = (updatedExercise: SessionExercise, prsHit: PRHit[]) => {
     const newExercises = [...exercises];
     newExercises[activeExerciseIndex] = updatedExercise;
     setExercises(newExercises);
+
+    if (prsHit.length > 0) {
+      setSessionPRs(prev => [...prev, ...prsHit]);
+    }
   };
 
   const handleCompleteWorkout = async () => {
@@ -96,18 +108,28 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
         token: token!,
       });
 
-      setCompletionStats({
-        volume: totalVolume,
-        duration: durationSeconds,
-        prs: exercises.filter(e => e.sets.some(s => parseFloat(s.weight) > e.lastWeight)).map(e => e.name)
-      });
-      setShowCompletion(true);
+      setShowCompleteScreen(true);
     } catch (e: any) {
       alert(e.message || 'Failed to save workout');
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (showCompleteScreen) {
+    return (
+      <WorkoutCompleteScreen
+        exercises={exercises}
+        sessionPRs={sessionPRs}
+        startedAt={startedAt}
+        bodyWeight={bodyWeight}
+        onDone={() => {
+          setShowCompleteScreen(false);
+          router.replace('/(tabs)/');
+        }}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#0a0a0a]">
@@ -148,22 +170,10 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
       {step === 4 && (
         <ExerciseLogStep 
           exercise={exercises[activeExerciseIndex]}
-          onSave={handleUpdateExercise}
+          onSave={handleExerciseSaved}
           handleBack={handleBack}
         />
       )}
-
-      <CompletionModal 
-        visible={showCompletion}
-        totalVolume={completionStats.volume}
-        durationSeconds={completionStats.duration}
-        prsHit={completionStats.prs}
-        unit={unit}
-        onDone={() => {
-          setShowCompletion(false);
-          router.replace('/(tabs)/');
-        }}
-      />
     </View>
   );
 };

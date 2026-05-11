@@ -15,6 +15,7 @@ import { WorkoutCompleteScreen } from "./WorkoutCompleteScreen";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { router } from "expo-router";
+import { SessionStorage } from "../../lib/storage";
 
 interface WorkoutFlowProps {
 	initialExercises: SessionExercise[];
@@ -24,6 +25,8 @@ interface WorkoutFlowProps {
 	unit: "kg" | "lb";
 	mode: WorkoutMode;
 	plateauData: Record<string, PlateauInfo>;
+	initialBodyWeight?: string;
+	initialStartedAt?: Date | null;
 }
 
 export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
@@ -34,10 +37,12 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 	unit,
 	mode,
 	plateauData,
+	initialBodyWeight = "",
+	initialStartedAt = null,
 }) => {
 	const { token } = useAuth();
 	const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-	const [bodyWeight, setBodyWeight] = useState("");
+	const [bodyWeight, setBodyWeight] = useState(initialBodyWeight);
 	const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
 	const [exercises, setExercises] = useState<SessionExercise[]>(
 		initialExercises.map((ex) => ({
@@ -45,7 +50,7 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 			plateauInfo: plateauData?.[ex.exerciseId?.toString()] ?? null,
 		})),
 	);
-	const [startedAt, setStartedAt] = useState<Date | null>(null);
+	const [startedAt, setStartedAt] = useState<Date | null>(initialStartedAt);
 	const [isLive, setIsLive] = useState(mode === "LIVE_SESSION");
 	const [sessionPRs, setSessionPRs] = useState<PRHit[]>([]);
 	const [showCompleteScreen, setShowCompleteScreen] = useState(false);
@@ -56,6 +61,20 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 	useEffect(() => {
 		scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 	}, [step]);
+
+	// Persist session on changes
+	useEffect(() => {
+		if (exercises.length > 0) {
+			SessionStorage.saveSession({
+				workoutName,
+				splitName,
+				exercises,
+				startedAt: startedAt ? startedAt.toISOString() : null,
+				bodyWeight,
+				lastUpdated: Date.now(),
+			});
+		}
+	}, [exercises, bodyWeight, startedAt]);
 
 	const goNext = () => setStep((s) => Math.min(s + 1, 4) as 1 | 2 | 3 | 4);
 	const handleBack = () => {
@@ -114,6 +133,7 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 		}
 
 		setShowCompleteScreen(true);
+		SessionStorage.clearSession();
 	};
 
 	if (showCompleteScreen) {

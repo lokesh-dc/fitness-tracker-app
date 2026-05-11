@@ -5,9 +5,11 @@ import { apiFetch } from "../../src/lib/api";
 import { WorkoutFlow } from "../../src/components/workout/WorkoutFlow";
 import { SessionExercise, WorkoutMode } from "../../src/types/workout";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SessionStorage } from "../../src/lib/storage";
 
 interface WorkoutSetupResponse {
 	lastLog: any | null;
+	todayLog: any | null;
 	activePlan: any | null;
 	exerciseRecords: any[];
 	userUnit: "kg" | "lb";
@@ -21,6 +23,8 @@ export default function WorkoutScreen() {
 	const [error, setError] = useState<string | null>(null);
 	const [setupData, setSetupData] = useState<WorkoutSetupResponse | null>(null);
 	const [exercises, setExercises] = useState<SessionExercise[]>([]);
+	const [initialBodyWeight, setInitialBodyWeight] = useState("");
+	const [initialStartedAt, setInitialStartedAt] = useState<Date | null>(null);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -43,12 +47,23 @@ export default function WorkoutScreen() {
 				templates.find((t: any) => t.dayOfWeek === promptDay); // Fallback to prompt mapping
 
 			const lastLog = data.lastLog;
+			const todayLog = data.todayLog;
 			const records = data.exerciseRecords;
 
 			if (todayTemplate && todayTemplate.exercises?.length > 0) {
 				sessionExercises = todayTemplate.exercises.map((ex: any) => {
+					// Check if this exercise was already logged today (e.g. on website)
+					const matchingLogEx = todayLog?.exercises?.find((le: any) => {
+						const leId = le.exerciseId ? String(le.exerciseId) : null;
+						const exId = ex.exerciseId ? String(ex.exerciseId) : null;
+						return (
+							(leId && exId && leId === exId) ||
+							le.name?.toLowerCase().trim() === ex.name?.toLowerCase().trim()
+						);
+					});
+
 					const lastEx = lastLog?.exercises?.find(
-						(le: any) => le.exerciseId === ex.exerciseId,
+						(le: any) => String(le.exerciseId) === String(ex.exerciseId),
 					);
 					const record = records.find(
 						(r: any) =>
@@ -75,9 +90,14 @@ export default function WorkoutScreen() {
 							data.plateauData?.[String(ex.exerciseId)]?.localMaxReps ||
 							0,
 						unit: data.userUnit,
-						isDone: false,
+						isDone: !!matchingLogEx,
 						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
 						sets:
+							matchingLogEx?.sets?.map((s: any) => ({
+								weight: s.weight.toString(),
+								reps: s.reps.toString(),
+								done: true,
+							})) ||
 							lastEx?.sets?.map((s: any) => ({
 								weight: s.weight.toString(),
 								reps: s.reps.toString(),
@@ -90,8 +110,9 @@ export default function WorkoutScreen() {
 							})),
 					};
 				});
-			} else if (lastLog && lastLog.exercises?.length > 0) {
-				sessionExercises = lastLog.exercises.map((ex: any) => {
+			} else if (todayLog && todayLog.exercises?.length > 0) {
+				// If no template but we have today's log, use the log itself
+				sessionExercises = todayLog.exercises.map((ex: any) => {
 					const record = records.find(
 						(r: any) =>
 							r.exerciseName === ex.name || r.exerciseId === ex.exerciseId,
@@ -116,6 +137,32 @@ export default function WorkoutScreen() {
 							data.plateauData?.[String(ex.exerciseId)]?.localMaxReps ||
 							0,
 						unit: data.userUnit,
+						isDone: true,
+						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
+						sets: ex.sets?.map((s: any) => ({
+							weight: s.weight.toString(),
+							reps: s.reps.toString(),
+							done: true,
+						})),
+					};
+				});
+			} else {
+				// Fallback to last log weights if no template or today log
+				sessionExercises = (lastLog?.exercises || []).map((ex: any) => {
+					const record = records.find(
+						(r: any) =>
+							r.exerciseName === ex.name || r.exerciseId === ex.exerciseId,
+					);
+					return {
+						exerciseId: String(ex.exerciseId),
+						name: ex.name,
+						muscleGroup: ex.muscleGroup || "General",
+						targetSets: ex.sets?.length || 3,
+						targetReps: ex.sets?.[0]?.reps || 10,
+						lastWeight: ex.sets?.[0]?.weight || 0,
+						currentPR: record?.currentPR || 0,
+						currentPRReps: record?.currentPRReps || 0,
+						unit: data.userUnit,
 						isDone: false,
 						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
 						sets: ex.sets?.map((s: any) => ({
@@ -125,23 +172,42 @@ export default function WorkoutScreen() {
 						})),
 					};
 				});
-			} else {
-				sessionExercises = [
-					{
-						exerciseId: "new-1",
-						name: "New Exercise",
-						muscleGroup: "General",
-						targetSets: 3,
-						targetReps: 10,
-						lastWeight: 0,
-						currentPR: 0,
-						currentPRReps: 0,
-						unit: data.userUnit,
-						isDone: false,
-						plateauInfo: null,
-						sets: [{ weight: "", reps: "", done: false }],
-					},
-				];
+			}
+
+			// 2. Check for persisted session to resume
+			const persisted = await SessionStorage.getSession();
+			if (persisted) {
+				const isSameDay =
+					new Date(persisted.lastUpdated).toDateString() ===
+					new Date().toDateString();
+
+				if (isSameDay && persisted.exercises?.length > 0) {
+					// SMART MERGE: API data (website) + Local data (mobile)
+					sessionExercises = sessionExercises.map((apiEx) => {
+						const localEx = persisted.exercises.find(
+							(le) => String(le.exerciseId) === String(apiEx.exerciseId),
+						);
+						if (!localEx) return apiEx;
+
+						// If website marked it done, it stays done.
+						// Otherwise, use local state (which might have progress)
+						return apiEx.isDone ? apiEx : localEx;
+					});
+
+					// Keep any "Log Again" extra exercises from local
+					const extraLocal = persisted.exercises.filter(
+						(le) =>
+							!sessionExercises.some(
+								(ae) => String(ae.exerciseId) === String(le.exerciseId),
+							),
+					);
+					sessionExercises = [...sessionExercises, ...extraLocal];
+
+					setInitialBodyWeight(persisted.bodyWeight || "");
+					setInitialStartedAt(
+						persisted.startedAt ? new Date(persisted.startedAt) : null,
+					);
+				}
 			}
 
 			setExercises(sessionExercises);
@@ -194,6 +260,8 @@ export default function WorkoutScreen() {
 				unit={setupData?.userUnit || "kg"}
 				mode="LIVE_SESSION"
 				plateauData={setupData?.plateauData || {}}
+				initialBodyWeight={initialBodyWeight}
+				initialStartedAt={initialStartedAt}
 			/>
 		</SafeAreaView>
 	);

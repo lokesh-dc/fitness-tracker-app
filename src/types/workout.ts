@@ -51,3 +51,27 @@ export interface WorkoutSession {
   startedAt: Date | null
   mode: WorkoutMode
 }
+
+export interface SaveWorkoutPayload {
+  workoutName: string
+  splitName: string
+  bodyWeight: number | null
+  startedAt: string
+  completedAt: string
+  durationSeconds: number
+  exercises: {
+    exerciseId: string
+    name: string
+    muscleGroup: string
+    targetSets: number
+    targetReps: number
+    unit: 'kg' | 'lb'
+    isDone: boolean
+    sets: {
+      weight: number
+      reps: number
+      done: boolean
+    }[]
+  }[]
+}
+

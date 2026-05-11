@@ -187,10 +187,9 @@ export default function WorkoutScreen() {
 			<WorkoutFlow
 				initialExercises={exercises}
 				lastBodyWeight={setupData?.lastBodyWeight || null}
-				workoutName={
-					setupData?.activePlan?.todayTemplate?.splitName ||
-					setupData?.activePlan?.name ||
-					"Quick Workout"
+				workoutName={setupData?.activePlan?.name || "Quick Workout"}
+				splitName={
+					setupData?.activePlan?.splitName || setupData?.activePlan?.name || ""
 				}
 				unit={setupData?.userUnit || "kg"}
 				mode="LIVE_SESSION"

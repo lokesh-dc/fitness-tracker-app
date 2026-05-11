@@ -52,9 +52,16 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 	} = useRestTimer();
 
 	useEffect(() => {
+		setSets(
+			exercise.sets.length > 0
+				? exercise.sets
+				: [{ weight: "", reps: "", done: false }],
+		);
 		setPlateauDismissed(false);
 		setPrsHitThisExercise([]);
-	}, [exercise.exerciseId]);
+	}, [exercise]);
+
+	const isDone = exercise.isDone;
 
 	const plateauData = exercise.plateauInfo;
 	const history = plateauData?.history || [];
@@ -150,8 +157,10 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 		}
 	};
 
-	const handleSave = () => {
-		const validSets = exercise.sets.filter(
+	const finishExercise = (
+		callback: (savedEx: SessionExercise, prs: PRHit[]) => void,
+	) => {
+		const validSets = sets.filter(
 			(s) => parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
 		);
 
@@ -165,13 +174,18 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 
 			setTimeout(() => {
 				setCelebrationPR(null);
-				onSave(savedExercise, prsHitThisExercise);
-				handleBack();
+				callback(savedExercise, prsHitThisExercise);
 			}, 2000);
 		} else {
-			onSave(savedExercise, []);
-			handleBack();
+			callback(savedExercise, []);
 		}
+	};
+
+	const handleSave = () => {
+		finishExercise((savedEx, prs) => {
+			onSave(savedEx, prs);
+			handleBack();
+		});
 	};
 
 	return (
@@ -188,7 +202,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 
 					<View className="items-center flex-1 pr-8">
 						<Text className="text-white font-bold text-xl text-center">
-							{exercise.name}
+							{exercise.name} {isDone && "✓"}
 						</Text>
 						<View className="flex-row items-center gap-x-2 mt-1">
 							<View className="px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20">
@@ -239,7 +253,9 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 									{isPlateaued && (
 										<View className="flex-row items-center ml-3 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40">
 											<Ionicons name="alert-circle" size={10} color="#f59e0b" />
-											<Text className="text-amber-500 text-[8px] font-black uppercase ml-1 tracking-wider">Plateau</Text>
+											<Text className="text-amber-500 text-[8px] font-black uppercase ml-1 tracking-wider">
+												Plateau
+											</Text>
 										</View>
 									)}
 								</View>
@@ -369,7 +385,9 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 				onClose={() => setPlateauModalVisible(false)}
 			/>
 
-			<StickyBottomBar primaryLabel="Save Exercise ✓" onPrimary={handleSave}>
+			<StickyBottomBar
+				primaryLabel={isDone ? "Update Exercise ✓" : "Save Exercise ✓"}
+				onPrimary={handleSave}>
 				<View className="flex-row gap-x-3 mb-4">
 					<TouchableOpacity
 						onPress={() => setWarmupVisible(true)}

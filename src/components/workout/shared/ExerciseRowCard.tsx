@@ -8,19 +8,24 @@ interface ExerciseRowCardProps {
 	exercise: SessionExercise;
 	variant: "preview" | "list" | "done";
 	onStart?: () => void;
+	onLogAgain?: () => void;
 }
 
 export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 	exercise,
 	variant,
 	onStart,
+	onLogAgain,
 }) => {
 	const isDone = variant === "done";
+	const Container = onStart ? TouchableOpacity : View;
 
 	return (
-		<View
+		<Container
+			onPress={onStart}
+			activeOpacity={0.8}
 			className={`mb-4 p-4 rounded-xl border border-white/10 bg-white/5 ${
-				isDone ? "opacity-50" : ""
+				isDone ? "opacity-60" : ""
 			}`}>
 			<View className="flex-row items-center justify-between">
 				<View className="flex-1">
@@ -66,23 +71,34 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 						</View>
 
 						{variant === "list" && (
-							<TouchableOpacity
-								onPress={onStart}
-								activeOpacity={0.7}
-								className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center">
+							<View className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center">
 								<Text className="text-white font-bold text-xs mr-1">Start</Text>
 								<Ionicons name="chevron-forward" size={14} color="white" />
-							</TouchableOpacity>
+							</View>
 						)}
 
 						{isDone && (
-							<View className="bg-green-500/20 p-2 rounded-full border border-green-500/30">
-								<Ionicons name="checkmark-circle" size={18} color="#22c55e" />
+							<View className="items-center gap-y-2">
+								<TouchableOpacity
+									onPress={(e) => {
+										e.stopPropagation();
+										onLogAgain?.();
+									}}
+									activeOpacity={0.7}
+									className="bg-green-500/10 px-2 py-1 rounded-lg border border-green-500/20 flex-row items-center">
+									<Ionicons name="refresh" size={10} color="#22c55e" />
+									<Text className="text-green-500 font-black text-[8px] ml-1 uppercase tracking-tighter">
+										Log Again
+									</Text>
+								</TouchableOpacity>
+								<View className="bg-green-500/20 p-1.5 rounded-full border border-green-500/30">
+									<Ionicons name="checkmark-circle" size={14} color="#22c55e" />
+								</View>
 							</View>
 						)}
 					</View>
 				</View>
 			</View>
-		</View>
+		</Container>
 	);
 };

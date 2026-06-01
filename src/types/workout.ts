@@ -40,7 +40,9 @@ export interface SessionExercise {
   sets: SetEntry[];
   restDuration?: number; // seconds
   currentPRReps: number        // max reps at current PR weight, 0 if no PR
-  plateauInfo: PlateauInfo | null
+  plateauInfo: PlateauInfo | null;
+  oneRMHistory: OneRMHistoryEntry[]; // up to 5 entries, oldest first
+  isSkipped?: boolean;
 }
 
 export interface WorkoutSession {
@@ -67,11 +69,39 @@ export interface SaveWorkoutPayload {
     targetReps: number
     unit: 'kg' | 'lb'
     isDone: boolean
+    isSkipped?: boolean
     sets: {
       weight: number
       reps: number
       done: boolean
     }[]
   }[]
+}
+
+export interface OneRMHistoryEntry {
+  date: string; // ISO date string
+  estimated1RM: number;
+}
+
+export interface ExerciseOneRM {
+  estimated1RM: number;
+  basedOn: { weight: number; reps: number };
+  previous1RM: number | null;
+}
+
+export interface SaveWorkoutResponse {
+  success: boolean;
+  workoutLogId?: string;
+  oneRepMaxes?: Record<string, ExerciseOneRM>;
+  error?: string;
+}
+
+export interface ExerciseRecord {
+  exerciseId: string;
+  exerciseName: string;
+  currentPR: number;
+  currentPRReps: number;
+  prDate: string;
+  oneRMHistory: OneRMHistoryEntry[];
 }
 

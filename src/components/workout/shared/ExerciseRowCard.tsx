@@ -18,6 +18,7 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 	onLogAgain,
 }) => {
 	const isDone = variant === "done";
+	const isSkipped = exercise.isSkipped;
 	const Container = onStart ? TouchableOpacity : View;
 
 	return (
@@ -25,7 +26,7 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 			onPress={onStart}
 			activeOpacity={0.8}
 			className={`mb-4 p-4 rounded-xl border border-white/10 bg-white/5 ${
-				isDone ? "opacity-60" : ""
+				isDone || isSkipped ? "opacity-60" : ""
 			}`}>
 			<View className="flex-row items-center justify-between">
 				<View className="flex-1">
@@ -70,10 +71,17 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 							)}
 						</View>
 
-						{variant === "list" && (
+						{variant === "list" && !isSkipped && (
 							<View className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center">
 								<Text className="text-white font-bold text-xs mr-1">Start</Text>
 								<Ionicons name="chevron-forward" size={14} color="white" />
+							</View>
+						)}
+
+						{isSkipped && (
+							<View className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex-row items-center">
+								<Text className="text-white/40 font-bold text-xs mr-1">Skipped</Text>
+								<Ionicons name="ban-outline" size={14} color="rgba(255,255,255,0.4)" />
 							</View>
 						)}
 

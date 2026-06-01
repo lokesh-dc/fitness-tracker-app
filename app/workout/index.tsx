@@ -92,6 +92,7 @@ export default function WorkoutScreen() {
 						unit: data.userUnit,
 						isDone: !!matchingLogEx,
 						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
+						oneRMHistory: record?.oneRMHistory ?? [],
 						sets:
 							matchingLogEx?.sets?.map((s: any) => ({
 								weight: s.weight.toString(),
@@ -139,6 +140,7 @@ export default function WorkoutScreen() {
 						unit: data.userUnit,
 						isDone: true,
 						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
+						oneRMHistory: record?.oneRMHistory ?? [],
 						sets: ex.sets?.map((s: any) => ({
 							weight: s.weight.toString(),
 							reps: s.reps.toString(),
@@ -165,6 +167,7 @@ export default function WorkoutScreen() {
 						unit: data.userUnit,
 						isDone: false,
 						plateauInfo: data.plateauData?.[String(ex.exerciseId)] || null,
+						oneRMHistory: record?.oneRMHistory ?? [],
 						sets: ex.sets?.map((s: any) => ({
 							weight: s.weight.toString(),
 							reps: s.reps.toString(),

@@ -19,6 +19,7 @@ import { PlateauBanner } from "../PlateauBanner";
 import { PlateauDetailModal } from "../PlateauDetailModal";
 import { PRCelebrationOverlay } from "../PRCelebrationOverlay";
 import { useRestTimer } from "../../../hooks/useRestTimer";
+import { OneRMSparkline } from "../OneRMSparkline";
 
 interface ExerciseLogStepProps {
 	exercise: SessionExercise;
@@ -188,6 +189,12 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 		});
 	};
 
+	const handleSkip = () => {
+		const skippedExercise = { ...exercise, isSkipped: true, isDone: false };
+		onSave(skippedExercise, []);
+		handleBack();
+	};
+
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -242,44 +249,12 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 						/>
 					</View>
 				)}
-				{exercise.plateauInfo?.history &&
-					exercise.plateauInfo.history.length > 0 && (
-						<View className="mb-8 px-2">
-							<View className="flex-row justify-between items-center mb-3">
-								<View className="flex-row items-center">
-									<Text className="text-white/20 text-[10px] font-black uppercase tracking-[2px]">
-										Recent History
-									</Text>
-									{isPlateaued && (
-										<View className="flex-row items-center ml-3 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40">
-											<Ionicons name="alert-circle" size={10} color="#f59e0b" />
-											<Text className="text-amber-500 text-[8px] font-black uppercase ml-1 tracking-wider">
-												Plateau
-											</Text>
-										</View>
-									)}
-								</View>
-								<View className="flex-1 h-[1px] bg-white/5 ml-3" />
-							</View>
-							<View className="flex-row justify-between">
-								{exercise.plateauInfo.history.slice(0, 5).map((h, i) => (
-									<View key={i} className="items-center">
-										<View className="w-10 h-10 rounded-full bg-white/5 border border-white/5 items-center justify-center mb-1">
-											<Text className="text-white font-bold text-[11px]">
-												{h.maxWeight}
-											</Text>
-										</View>
-										<Text className="text-white/20 text-[8px] font-bold uppercase">
-											{new Date(h.date).toLocaleDateString("en-US", {
-												month: "short",
-												day: "numeric",
-											})}
-										</Text>
-									</View>
-								))}
-							</View>
-						</View>
-					)}
+				{exercise.oneRMHistory && exercise.oneRMHistory.length > 0 && (
+					<OneRMSparkline
+						history={exercise.oneRMHistory}
+						unit={exercise.unit}
+					/>
+				)}
 			</View>
 
 			<ScrollView
@@ -418,6 +393,14 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 						/>
 					</TouchableOpacity>
 				</View>
+
+				<TouchableOpacity
+					onPress={handleSkip}
+					className="w-full py-3 items-center justify-center mb-2">
+					<Text className="text-white/30 text-[10px] font-black uppercase tracking-[3px]">
+						Skip Exercise
+					</Text>
+				</TouchableOpacity>
 			</StickyBottomBar>
 
 			{celebrationPR && <PRCelebrationOverlay pr={celebrationPR} />}

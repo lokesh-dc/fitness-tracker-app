@@ -33,7 +33,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 	session,
 }) => {
 	const insets = useSafeAreaInsets();
-	const { save, isSaving, error, savedLogId } = useWorkoutSave();
+	const { save, isSaving, error, savedLogId, oneRepMaxes } = useWorkoutSave();
 	const [saveAttempted, setSaveAttempted] = React.useState(false);
 
 	// Animations
@@ -273,15 +273,39 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 								);
 							}
 
+							const orm = oneRepMaxes?.[ex.exerciseId];
+							const delta = orm ? orm.estimated1RM - (orm.previous1RM ?? orm.estimated1RM) : 0;
+
 							return (
-								<View
-									key={index}
-									className="flex-row items-center justify-between">
-									<Text className="text-white font-bold flex-1">{ex.name}</Text>
-									<Text className="text-white/60 text-sm">
-										{completedSets.length} sets · {exVolume.toLocaleString()}{" "}
-										{unit}
-									</Text>
+								<View key={index} className="mb-4">
+									<View className="flex-row items-center justify-between">
+										<Text className="text-white font-bold flex-1">
+											{ex.name}
+										</Text>
+										<Text className="text-white/60 text-sm">
+											{completedSets.length} sets · {exVolume.toLocaleString()}{" "}
+											{unit}
+										</Text>
+									</View>
+									{orm && (
+										<View className="flex-row items-center gap-x-2 mt-1">
+											<Text className="text-orange-500 text-[11px] font-bold">
+												Est. 1RM: {orm.estimated1RM.toFixed(1)} {unit}
+											</Text>
+											{orm.previous1RM !== null && Math.abs(delta) > 0.1 && (
+												<View className="flex-row items-center">
+													<Feather
+														name={delta > 0 ? "trending-up" : "trending-down"}
+														size={10}
+														color={delta > 0 ? "#22c55e" : "#ef4444"}
+													/>
+													<Text className={`text-[10px] font-bold ml-1 ${delta > 0 ? "text-green-500" : "text-red-500"}`}>
+														{delta > 0 ? "+" : ""}{delta.toFixed(1)} {unit}
+													</Text>
+												</View>
+											)}
+										</View>
+									)}
 								</View>
 							);
 						})}

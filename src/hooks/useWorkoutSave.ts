@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { WorkoutSession, SaveWorkoutPayload } from '../types/workout';
+import { WorkoutSession, SaveWorkoutPayload, ExerciseOneRM, SaveWorkoutResponse } from '../types/workout';
 import { saveWorkoutSession } from '../lib/api/workout';
 
 interface UseWorkoutSaveReturn {
@@ -8,12 +8,14 @@ interface UseWorkoutSaveReturn {
   isSaving: boolean;
   error: string | null;
   savedLogId: string | null;
+  oneRepMaxes: Record<string, ExerciseOneRM>;
 }
 
 export function useWorkoutSave(): UseWorkoutSaveReturn {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedLogId, setSavedLogId] = useState<string | null>(null);
+  const [oneRepMaxes, setOneRepMaxes] = useState<Record<string, ExerciseOneRM>>({});
   const { token } = useAuth();
 
   const save = async (session: WorkoutSession) => {
@@ -31,6 +33,9 @@ export function useWorkoutSave(): UseWorkoutSaveReturn {
 
       if (result.success) {
         setSavedLogId(result.workoutLogId ?? null);
+        if (result.oneRepMaxes) {
+          setOneRepMaxes(result.oneRepMaxes);
+        }
       } else {
         setError(result.error ?? 'Something went wrong');
       }
@@ -41,7 +46,7 @@ export function useWorkoutSave(): UseWorkoutSaveReturn {
     }
   };
 
-  return { save, isSaving, error, savedLogId };
+  return { save, isSaving, error, savedLogId, oneRepMaxes };
 }
 
 function buildPayload(session: WorkoutSession): SaveWorkoutPayload {
@@ -56,7 +61,7 @@ function buildPayload(session: WorkoutSession): SaveWorkoutPayload {
     completedAt: completedAt.toISOString(),
     durationSeconds: Math.round((completedAt.getTime() - startedAt.getTime()) / 1000),
     exercises: session.exercises
-      .filter(ex => ex.isDone)
+      .filter(ex => ex.isDone || ex.isSkipped)
       .map(ex => ({
         exerciseId: ex.exerciseId,
         name: ex.name,
@@ -64,15 +69,18 @@ function buildPayload(session: WorkoutSession): SaveWorkoutPayload {
         targetSets: ex.targetSets,
         targetReps: ex.targetReps,
         unit: ex.unit,
-        isDone: true,
-        sets: ex.sets
-          .filter(s => s.done && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
-          .map(s => ({
-            weight: parseFloat(s.weight),
-            reps: parseInt(s.reps),
-            done: true,
-          })),
+        isDone: !!ex.isDone,
+        isSkipped: !!ex.isSkipped,
+        sets: ex.isSkipped 
+          ? [] 
+          : ex.sets
+              .filter(s => s.done && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
+              .map(s => ({
+                weight: parseFloat(s.weight),
+                reps: parseInt(s.reps),
+                done: true,
+              })),
       }))
-      .filter(ex => ex.sets.length > 0),
+      .filter(ex => ex.isSkipped || ex.sets.length > 0),
   };
 }

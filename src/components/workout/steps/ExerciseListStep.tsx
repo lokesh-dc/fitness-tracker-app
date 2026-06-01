@@ -25,8 +25,8 @@ export const ExerciseListStep: React.FC<ExerciseListStepProps> = ({
 	handleBack,
 	onComplete,
 }) => {
-	const doneCount = exercises.filter((e) => e.isDone).length;
-	const progress = exercises.length > 0 ? doneCount / exercises.length : 0;
+	const processedCount = exercises.filter((e) => e.isDone || e.isSkipped).length;
+	const progress = exercises.length > 0 ? processedCount / exercises.length : 0;
 
 	const handleStartExercise = (index: number) => {
 		setActiveExerciseIndex(index);
@@ -50,7 +50,7 @@ export const ExerciseListStep: React.FC<ExerciseListStepProps> = ({
 					</Text>
 					<View className="flex-row items-center justify-between mb-3">
 						<Text className="text-white/40 font-medium">
-							{doneCount}/{exercises.length} exercises done
+							{processedCount}/{exercises.length} exercises processed
 						</Text>
 						<Text className="text-orange-500 font-bold text-xs">
 							{Math.round(progress * 100)}%
@@ -83,7 +83,7 @@ export const ExerciseListStep: React.FC<ExerciseListStepProps> = ({
 			<StickyBottomBar
 				primaryLabel="Complete Workout"
 				onPrimary={onComplete}
-				primaryDisabled={doneCount === 0}
+				primaryDisabled={processedCount === 0}
 			/>
 		</View>
 	);

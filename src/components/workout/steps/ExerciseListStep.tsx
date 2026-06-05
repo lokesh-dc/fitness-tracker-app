@@ -11,6 +11,8 @@ interface ExerciseListStepProps {
 	exercises: SessionExercise[];
 	setActiveExerciseIndex: (index: number) => void;
 	onLogAgain: (index: number) => void;
+	onSkip: (index: number) => void;
+	onUnskip: (index: number) => void;
 	setStep: (step: 1 | 2 | 3 | 4) => void;
 	handleBack: () => void;
 	onComplete: () => void;
@@ -21,6 +23,8 @@ export const ExerciseListStep: React.FC<ExerciseListStepProps> = ({
 	exercises,
 	setActiveExerciseIndex,
 	onLogAgain,
+	onSkip,
+	onUnskip,
 	setStep,
 	handleBack,
 	onComplete,
@@ -76,6 +80,8 @@ export const ExerciseListStep: React.FC<ExerciseListStepProps> = ({
 						variant={item.isDone ? "done" : "list"}
 						onStart={() => handleStartExercise(index)}
 						onLogAgain={() => onLogAgain(index)}
+						onSkip={() => onSkip(index)}
+						onUnskip={() => onUnskip(index)}
 					/>
 				)}
 			/>

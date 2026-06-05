@@ -9,6 +9,8 @@ interface ExerciseRowCardProps {
 	variant: "preview" | "list" | "done";
 	onStart?: () => void;
 	onLogAgain?: () => void;
+	onSkip?: () => void;
+	onUnskip?: () => void;
 }
 
 export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
@@ -16,6 +18,8 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 	variant,
 	onStart,
 	onLogAgain,
+	onSkip,
+	onUnskip,
 }) => {
 	const isDone = variant === "done";
 	const isSkipped = exercise.isSkipped;
@@ -72,17 +76,47 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 						</View>
 
 						{variant === "list" && !isSkipped && (
-							<View className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center">
-								<Text className="text-white font-bold text-xs mr-1">Start</Text>
-								<Ionicons name="chevron-forward" size={14} color="white" />
+							<View className="flex-row items-center gap-x-2">
+								<TouchableOpacity
+									onPress={(e) => {
+										e.stopPropagation();
+										onSkip?.();
+									}}
+									activeOpacity={0.7}
+									className="bg-white/5 px-3 py-2 rounded-lg border border-white/10 flex-row items-center">
+									<Ionicons
+										name="ban-outline"
+										size={14}
+										color="rgba(255,255,255,0.4)"
+									/>
+									<Text className="text-white/40 font-bold text-xs ml-1">
+										Skip
+									</Text>
+								</TouchableOpacity>
+								<View className="bg-orange-500 px-4 py-2 rounded-lg flex-row items-center">
+									<Text className="text-white font-bold text-xs mr-1">Start</Text>
+									<Ionicons name="chevron-forward" size={14} color="white" />
+								</View>
 							</View>
 						)}
 
 						{isSkipped && (
-							<View className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex-row items-center">
-								<Text className="text-white/40 font-bold text-xs mr-1">Skipped</Text>
-								<Ionicons name="ban-outline" size={14} color="rgba(255,255,255,0.4)" />
-							</View>
+							<TouchableOpacity
+								onPress={(e) => {
+									e.stopPropagation();
+									onUnskip?.();
+								}}
+								activeOpacity={0.7}
+								className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex-row items-center">
+								<Text className="text-white/40 font-bold text-xs mr-1">
+									Skipped
+								</Text>
+								<Ionicons
+									name="refresh-outline"
+									size={14}
+									color="rgba(255,255,255,0.4)"
+								/>
+							</TouchableOpacity>
 						)}
 
 						{isDone && (

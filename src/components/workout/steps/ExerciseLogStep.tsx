@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { StickyBottomBar } from "../shared/StickyBottomBar";
 import { StepIndicator } from "../shared/StepIndicator";
-import { SessionExercise, SetEntry } from "../../../types/workout";
+import { SessionExercise, SetEntry, PRHit } from "../../../types/workout";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { WarmupBottomSheet } from "../WarmupBottomSheet";
@@ -165,7 +165,12 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 			(s) => parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
 		);
 
-		const savedExercise = { ...exercise, sets: validSets, isDone: true };
+		const savedExercise = {
+			...exercise,
+			sets: validSets,
+			isDone: true,
+			isSkipped: false,
+		};
 
 		if (prsHitThisExercise.length > 0) {
 			const topPR =

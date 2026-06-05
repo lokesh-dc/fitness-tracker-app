@@ -98,6 +98,25 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 		}
 	};
 
+	const handleSkipExercise = (index: number) => {
+		const newExercises = [...exercises];
+		newExercises[index] = {
+			...newExercises[index],
+			isSkipped: true,
+			isDone: false,
+		};
+		setExercises(newExercises);
+	};
+
+	const handleUnskipExercise = (index: number) => {
+		const newExercises = [...exercises];
+		newExercises[index] = {
+			...newExercises[index],
+			isSkipped: false,
+		};
+		setExercises(newExercises);
+	};
+
 	const handleDuplicateExercise = (index: number) => {
 		const ex = exercises[index];
 		const duplicated: SessionExercise = {
@@ -190,6 +209,8 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 					exercises={exercises}
 					setActiveExerciseIndex={setActiveExerciseIndex}
 					onLogAgain={handleDuplicateExercise}
+					onSkip={handleSkipExercise}
+					onUnskip={handleUnskipExercise}
 					setStep={setStep}
 					handleBack={handleBack}
 					onComplete={handleCompleteWorkout}

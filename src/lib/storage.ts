@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { SessionExercise } from '../types/workout';
 
 const ACTIVE_SESSION_KEY = 'fittrack_active_session';
@@ -15,7 +15,7 @@ interface PersistedSession {
 export const SessionStorage = {
   async saveSession(session: PersistedSession) {
     try {
-      await AsyncStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session));
+      await SecureStore.setItemAsync(ACTIVE_SESSION_KEY, JSON.stringify(session));
     } catch (e) {
       console.error('Failed to save session:', e);
     }
@@ -23,7 +23,7 @@ export const SessionStorage = {
 
   async getSession(): Promise<PersistedSession | null> {
     try {
-      const data = await AsyncStorage.getItem(ACTIVE_SESSION_KEY);
+      const data = await SecureStore.getItemAsync(ACTIVE_SESSION_KEY);
       return data ? JSON.parse(data) : null;
     } catch (e) {
       console.error('Failed to get session:', e);
@@ -33,7 +33,7 @@ export const SessionStorage = {
 
   async clearSession() {
     try {
-      await AsyncStorage.removeItem(ACTIVE_SESSION_KEY);
+      await SecureStore.deleteItemAsync(ACTIVE_SESSION_KEY);
     } catch (e) {
       console.error('Failed to clear session:', e);
     }

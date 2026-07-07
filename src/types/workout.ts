@@ -96,6 +96,36 @@ export interface SaveWorkoutResponse {
   error?: string;
 }
 
+export interface WorkoutLogEntry {
+  _id: string;
+  userId: string;
+  date: string;
+  name?: string;
+  splitName?: string;
+  bodyWeight?: number | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+  durationSeconds?: number;
+  exercises: {
+    exerciseId: string;
+    name: string;
+    isDone?: boolean;
+    isSkipped?: boolean;
+    pr?: number | null;
+    targetSets?: number;
+    targetReps?: number;
+    lastWeight?: number;
+    unit?: string;
+    sets: {
+      weight: number;
+      reps: number;
+      completed: boolean;
+    }[];
+  }[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface ExerciseRecord {
   exerciseId: string;
   exerciseName: string;

@@ -7,7 +7,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lokesh.ft.test"
+      "bundleIdentifier": "com.lokesh.ft.test",
+      "developmentTeam": "QWXXXT3D2C"
     },
     "plugins": [
       "expo-router",

@@ -13,6 +13,7 @@ import { SessionExercise, PRHit, WorkoutSession } from "../../types/workout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useWorkoutSave } from "../../hooks/useWorkoutSave";
+import { SessionStorage } from "../../lib/storage";
 import { ActivityIndicator } from "react-native";
 
 interface WorkoutCompleteScreenProps {
@@ -72,6 +73,13 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 			save(session);
 		}
 	}, []);
+
+	// Clear persisted session once save succeeds
+	useEffect(() => {
+		if (savedLogId) {
+			SessionStorage.clearSession();
+		}
+	}, [savedLogId]);
 
 	// Calculations
 	const durationMs = startedAt ? Date.now() - startedAt.getTime() : 0;
@@ -143,7 +151,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 						<Text className="text-white text-base font-bold mb-0.5">
 							{durationDisplay}
 						</Text>
-						<Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
+						<Text className="text-white/40 text-[12px] font-bold uppercase tracking-widest">
 							Time
 						</Text>
 					</View>
@@ -151,7 +159,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 						<Text className="text-white text-base font-bold mb-0.5">
 							{totalVolume.toLocaleString()}
 						</Text>
-						<Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
+						<Text className="text-white/40 text-[12px] font-bold uppercase tracking-widest">
 							{unit}
 						</Text>
 					</View>
@@ -159,7 +167,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 						<Text className="text-white text-base font-bold mb-0.5">
 							~{calories}
 						</Text>
-						<Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
+						<Text className="text-white/40 text-[12px] font-bold uppercase tracking-widest">
 							kcal
 						</Text>
 					</View>
@@ -168,7 +176,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 							className={`text-base font-bold mb-0.5 ${sessionPRs.length > 0 ? "text-orange-500" : "text-white/40"}`}>
 							{sessionPRs.length}
 						</Text>
-						<Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest">
+						<Text className="text-white/40 text-[12px] font-bold uppercase tracking-widest">
 							PRs
 						</Text>
 					</View>
@@ -289,7 +297,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 									</View>
 									{orm && (
 										<View className="flex-row items-center gap-x-2 mt-1">
-											<Text className="text-orange-500 text-[11px] font-bold">
+											<Text className="text-orange-500 text-[13px] font-bold">
 												Est. 1RM: {orm.estimated1RM.toFixed(1)} {unit}
 											</Text>
 											{orm.previous1RM !== null && Math.abs(delta) > 0.1 && (
@@ -299,7 +307,7 @@ export const WorkoutCompleteScreen: React.FC<WorkoutCompleteScreenProps> = ({
 														size={10}
 														color={delta > 0 ? "#22c55e" : "#ef4444"}
 													/>
-													<Text className={`text-[10px] font-bold ml-1 ${delta > 0 ? "text-green-500" : "text-red-500"}`}>
+													<Text className={`text-[12px] font-bold ml-1 ${delta > 0 ? "text-green-500" : "text-red-500"}`}>
 														{delta > 0 ? "+" : ""}{delta.toFixed(1)} {unit}
 													</Text>
 												</View>

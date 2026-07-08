@@ -32,11 +32,16 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 	onSave,
 	handleBack,
 }) => {
-	const [sets, setSets] = useState<SetEntry[]>(
-		exercise.sets.length > 0
+	const [sets, setSets] = useState<SetEntry[]>(() => {
+		const base = exercise.sets.length >= exercise.targetSets
 			? exercise.sets
-			: [{ weight: "", reps: "", done: false }],
-	);
+			: [...exercise.sets, ...Array.from({ length: exercise.targetSets - exercise.sets.length }, () => ({ weight: "", reps: "", done: false } as SetEntry))];
+		return base.map((s) => ({
+			...s,
+			weight: s.weight || (exercise.lastWeight > 0 ? exercise.lastWeight.toString() : ""),
+			reps: s.reps || (exercise.targetReps > 0 ? exercise.targetReps.toString() : ""),
+		}));
+	});
 	const [warmupVisible, setWarmupVisible] = useState(false);
 	const [plateauModalVisible, setPlateauModalVisible] = useState(false);
 	const [plateauDismissed, setPlateauDismissed] = useState(false);
@@ -53,11 +58,15 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 	} = useRestTimer();
 
 	useEffect(() => {
-		setSets(
-			exercise.sets.length > 0
-				? exercise.sets
-				: [{ weight: "", reps: "", done: false }],
-		);
+		const base = exercise.sets.length >= exercise.targetSets
+			? exercise.sets
+			: [...exercise.sets, ...Array.from({ length: exercise.targetSets - exercise.sets.length }, () => ({ weight: "", reps: "", done: false } as SetEntry))];
+		const next = base.map((s) => ({
+			...s,
+			weight: s.weight || (exercise.lastWeight > 0 ? exercise.lastWeight.toString() : ""),
+			reps: s.reps || (exercise.targetReps > 0 ? exercise.targetReps.toString() : ""),
+		}));
+		setSets(next);
 		setPlateauDismissed(false);
 		setPrsHitThisExercise([]);
 	}, [exercise]);
@@ -161,13 +170,14 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 	const finishExercise = (
 		callback: (savedEx: SessionExercise, prs: PRHit[]) => void,
 	) => {
-		const validSets = sets.filter(
-			(s) => parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
-		);
+		const savedSets = sets.map((s) => ({
+			...s,
+			done: parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
+		}));
 
 		const savedExercise = {
 			...exercise,
-			sets: validSets,
+			sets: savedSets,
 			isDone: true,
 			isSkipped: false,
 		};
@@ -208,7 +218,19 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 				<StepIndicator currentStep={4} />
 
 				<View className="flex-row items-center justify-between mb-6">
-					<TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
+					<TouchableOpacity
+						onPress={() => {
+							const savedBackSets = sets.map((s) => ({
+								...s,
+								done: parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
+							}));
+							onSave(
+								{ ...exercise, sets: savedBackSets, isDone: false },
+								[],
+							);
+							handleBack();
+						}}
+						className="p-2 -ml-2">
 						<Ionicons name="chevron-back" color="white" size={28} />
 					</TouchableOpacity>
 
@@ -218,7 +240,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 						</Text>
 						<View className="flex-row items-center gap-x-2 mt-1">
 							<View className="px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20">
-								<Text className="text-orange-500 text-[10px] font-bold uppercase tracking-wider">
+								<Text className="text-orange-500 text-[12px] font-bold uppercase tracking-wider">
 									{exercise.muscleGroup}
 								</Text>
 							</View>
@@ -227,7 +249,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 				</View>
 				<View className="flex-row gap-x-3 mb-6 justify-center">
 					<View className="bg-orange-500/10 border border-orange-500/20 px-4 py-2 rounded-2xl items-center flex-1">
-						<Text className="text-orange-500 text-[9px] font-black uppercase mb-0.5 tracking-widest">
+						<Text className="text-orange-500 text-[11px] font-black uppercase mb-0.5 tracking-widest">
 							Personal Record
 						</Text>
 						<Text className="text-white text-base font-bold">
@@ -237,7 +259,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 						</Text>
 					</View>
 					<View className="bg-white/5 border border-white/10 px-4 py-2 rounded-2xl items-center flex-1">
-						<Text className="text-white/40 text-[9px] font-bold uppercase mb-0.5 tracking-widest">
+						<Text className="text-white/40 text-[11px] font-bold uppercase mb-0.5 tracking-widest">
 							Target
 						</Text>
 						<Text className="text-white text-base font-bold">
@@ -266,16 +288,16 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 				className="flex-1 px-6"
 				contentContainerStyle={{ paddingBottom: 150 }}>
 				<View className="flex-row mb-4 px-2">
-					<Text className="w-10 text-white/40 text-[10px] font-black uppercase tracking-widest">
+					<Text className="w-10 text-white/40 text-[12px] font-black uppercase tracking-widest">
 						#
 					</Text>
-					<Text className="flex-1 text-white/40 text-[10px] font-black uppercase tracking-widest text-center">
+					<Text className="flex-1 text-white/40 text-[12px] font-black uppercase tracking-widest text-center">
 						Weight ({exercise.unit})
 					</Text>
-					<Text className="flex-1 text-white/40 text-[10px] font-black uppercase tracking-widest text-center">
+					<Text className="flex-1 text-white/40 text-[12px] font-black uppercase tracking-widest text-center">
 						Reps
 					</Text>
-					<Text className="w-10 text-white/40 text-[10px] font-black uppercase tracking-widest text-right">
+					<Text className="w-10 text-white/40 text-[12px] font-black uppercase tracking-widest text-right">
 						✓
 					</Text>
 				</View>
@@ -402,7 +424,7 @@ export const ExerciseLogStep: React.FC<ExerciseLogStepProps> = ({
 				<TouchableOpacity
 					onPress={handleSkip}
 					className="w-full py-3 items-center justify-center mb-2">
-					<Text className="text-white/30 text-[10px] font-black uppercase tracking-[3px]">
+					<Text className="text-white/30 text-[12px] font-black uppercase tracking-[3px]">
 						Skip Exercise
 					</Text>
 				</TouchableOpacity>

@@ -229,7 +229,7 @@ export default function WorkoutScreen() {
 		return (
 			<View className="flex-1 bg-[#0a0a0a] items-center justify-center">
 				<ActivityIndicator size="large" color="#f97316" />
-				<Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[10px]">
+				<Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[12px]">
 					Preparing Session
 				</Text>
 			</View>

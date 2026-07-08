@@ -39,7 +39,7 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 							{exercise.currentPR > 0 && (
 								<View className="flex-row items-center gap-x-1 bg-orange-500/10 border border-orange-500/20 px-1.5 py-0.5 rounded">
 									<Feather name="award" size={10} color="#f97316" />
-									<Text className="text-orange-500 text-[8px] font-black uppercase">
+									<Text className="text-orange-500 text-[10px] font-black uppercase">
 										{exercise.currentPR} {exercise.unit}
 									</Text>
 								</View>
@@ -129,7 +129,7 @@ export const ExerciseRowCard: React.FC<ExerciseRowCardProps> = ({
 									activeOpacity={0.7}
 									className="bg-green-500/10 px-2 py-1 rounded-lg border border-green-500/20 flex-row items-center">
 									<Ionicons name="refresh" size={10} color="#22c55e" />
-									<Text className="text-green-500 font-black text-[8px] ml-1 uppercase tracking-tighter">
+									<Text className="text-green-500 font-black text-[10px] ml-1 uppercase tracking-tighter">
 										Log Again
 									</Text>
 								</TouchableOpacity>

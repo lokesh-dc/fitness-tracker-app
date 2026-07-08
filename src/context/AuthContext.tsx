@@ -14,7 +14,7 @@ interface AuthContextValue {
 	user: User | null;
 	token: string | null;
 	isLoading: boolean;
-	login: (email: string, password: string) => Promise<void>;
+	login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
 	logout: () => Promise<void>;
 }
 
@@ -28,25 +28,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	// Rehydrate token on app launch
 	useEffect(() => {
 		SecureStore.getItemAsync(TOKEN_KEY).then((stored) => {
-			if (stored) {
-				// Token exists — decode user from it (no extra network call)
-				try {
-					const payload = JSON.parse(atob(stored.split(".")[1]));
-					setToken(stored);
-					setUser({
-						id: payload.sub,
-						email: payload.email,
-						name: payload.name,
-					});
-				} catch {
-					SecureStore.deleteItemAsync(TOKEN_KEY);
-				}
+			if (!stored) {
+				setIsLoading(false);
+				return;
 			}
-			setIsLoading(false);
+
+			// Try decoding JWT locally first
+			let decoded = false;
+			try {
+				const parts = stored.split(".");
+				if (parts.length === 3) {
+					const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+					const payload = JSON.parse(atob(base64));
+					if (payload.sub && payload.email) {
+						setToken(stored);
+						setUser({
+							id: payload.sub,
+							email: payload.email,
+							name: payload.name || "",
+						});
+						decoded = true;
+					}
+				}
+			} catch {
+				// Fall through to API check
+			}
+
+			if (decoded) {
+				setIsLoading(false);
+			} else {
+				// Local decode failed — verify token via API
+				apiFetch<{ user: User }>("/api/auth/me", { token: stored })
+					.then((data) => {
+						setToken(stored);
+						setUser(data.user);
+					})
+					.catch(() => {
+						SecureStore.deleteItemAsync(TOKEN_KEY);
+					})
+					.finally(() => setIsLoading(false));
+			}
 		});
 	}, []);
 
-	async function login(email: string, password: string) {
+	async function login(email: string, password: string, rememberMe = true) {
 		const data = await apiFetch<{ token: string; user: User }>(
 			"/api/auth/login",
 			{
@@ -54,9 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				body: JSON.stringify({ email, password }),
 			},
 		);
-		await SecureStore.setItemAsync(TOKEN_KEY, data.token);
 		setToken(data.token);
 		setUser(data.user);
+		if (rememberMe) {
+			await SecureStore.setItemAsync(TOKEN_KEY, data.token);
+		} else {
+			await SecureStore.deleteItemAsync(TOKEN_KEY);
+		}
 	}
 
 	async function logout() {

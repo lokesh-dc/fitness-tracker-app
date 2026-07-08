@@ -51,7 +51,7 @@ export const OneRMSparkline: React.FC<OneRMSparklineProps> = ({
         >
 			<View className="flex-row justify-between items-end mb-4">
 				<View>
-					<Text className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">
+					<Text className="text-white/40 text-[12px] font-bold uppercase tracking-widest mb-1">
 						Est. 1RM
 					</Text>
 					<Text className="text-orange-500 text-2xl font-bold tabular-nums">
@@ -61,8 +61,8 @@ export const OneRMSparkline: React.FC<OneRMSparklineProps> = ({
 				
 				{/* Simple Min/Max Indicator */}
 				<View className="items-end">
-					<Text className="text-white/20 text-[9px] font-medium uppercase">Range</Text>
-					<Text className="text-white/40 text-[10px] font-bold">
+					<Text className="text-white/20 text-[11px] font-medium uppercase">Range</Text>
+					<Text className="text-white/40 text-[12px] font-bold">
 						{Math.min(...history.map(h => h.estimated1RM)).toFixed(0)} - {Math.max(...history.map(h => h.estimated1RM)).toFixed(0)}
 					</Text>
 				</View>
@@ -123,7 +123,7 @@ export const OneRMSparkline: React.FC<OneRMSparklineProps> = ({
                     const date = new Date(h.date);
                     const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     return (
-                        <Text key={i} className="text-white/20 text-[8px] font-medium">
+                        <Text key={i} className="text-white/20 text-[10px] font-medium">
                             {label}
                         </Text>
                     );

@@ -16,6 +16,7 @@ export default function LoginScreen() {
 	const { login } = useAuth();
 	const [email, setEmail] = useState("lokesh.cdewanand@gmail.com");
 	const [password, setPassword] = useState("lokesh@gmail");
+	const [rememberMe, setRememberMe] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -27,7 +28,7 @@ export default function LoginScreen() {
 		setError(null);
 		setIsLoading(true);
 		try {
-			const data = await login(email.trim().toLowerCase(), password);
+			await login(email.trim().toLowerCase(), password, rememberMe);
 			router.replace("/(tabs)/");
 		} catch (e: any) {
 			setError(e.message ?? "Sign in failed. Check your credentials.");
@@ -100,6 +101,24 @@ export default function LoginScreen() {
 									className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white text-base"
 								/>
 							</View>
+
+							{/* Remember Me */}
+							<TouchableOpacity
+								onPress={() => setRememberMe(!rememberMe)}
+								className="flex-row items-center mt-1"
+								activeOpacity={0.7}>
+								<View
+									className={`w-5 h-5 rounded-md border-2 items-center justify-center mr-3 ${
+										rememberMe
+											? "bg-orange-500 border-orange-500"
+											: "border-white/20"
+									}`}>
+									{rememberMe && (
+										<Text className="text-white text-xs font-bold">✓</Text>
+									)}
+								</View>
+								<Text className="text-white/50 text-sm">Remember me</Text>
+							</TouchableOpacity>
 
 							{/* Submit */}
 							<TouchableOpacity

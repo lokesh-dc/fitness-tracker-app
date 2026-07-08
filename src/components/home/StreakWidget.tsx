@@ -20,7 +20,7 @@ export default function StreakWidget({ data }: Props) {
             <Ionicons name="flame" size={18} color="#f97316" />
             <Text className="text-orange-500 text-2xl font-bold">{data.currentStreak}</Text>
           </View>
-          <Text className="text-white/30 text-[10px] uppercase tracking-wider font-semibold">
+          <Text className="text-white/30 text-[12px] uppercase tracking-wider font-semibold">
             Current
           </Text>
         </View>
@@ -29,13 +29,13 @@ export default function StreakWidget({ data }: Props) {
             <Ionicons name="trophy" size={18} color="rgba(255,255,255,0.4)" />
             <Text className="text-white text-2xl font-bold">{data.longestStreak}</Text>
           </View>
-          <Text className="text-white/30 text-[10px] uppercase tracking-wider font-semibold">
+          <Text className="text-white/30 text-[12px] uppercase tracking-wider font-semibold">
             Best
           </Text>
         </View>
       </View>
       {data.lastWorkoutDate && (
-        <Text className="text-white/20 text-[10px] text-center mt-2 uppercase tracking-wider">
+        <Text className="text-white/20 text-[12px] text-center mt-2 uppercase tracking-wider">
           Last: {data.lastWorkoutDate}
         </Text>
       )}

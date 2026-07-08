@@ -147,12 +147,20 @@ export const WorkoutFlow: React.FC<WorkoutFlowProps> = ({
 			.filter((ex) => ex.sets.length > 0);
 
 		if (validExercises.length === 0) {
-			alert("Log at least one set before finishing.");
+			const hasAnyData = exercises.some((ex) =>
+				ex.sets.some(
+					(s) => parseFloat(s.weight) > 0 || parseInt(s.reps) > 0,
+				),
+			);
+			if (hasAnyData) {
+				setShowCompleteScreen(true);
+			} else {
+				alert("Log at least one set before finishing.");
+			}
 			return;
 		}
 
 		setShowCompleteScreen(true);
-		SessionStorage.clearSession();
 	};
 
 	if (showCompleteScreen) {

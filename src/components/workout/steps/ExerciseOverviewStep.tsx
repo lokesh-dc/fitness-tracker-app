@@ -49,7 +49,7 @@ export const ExerciseOverviewStep: React.FC<ExerciseOverviewStepProps> = ({
           <Text className="text-white text-3xl font-bold mb-1">
             Ready for your workout?
           </Text>
-          <Text className="text-white/40 font-medium mb-4 uppercase tracking-widest text-[10px]">
+          <Text className="text-white/40 font-medium mb-4 uppercase tracking-widest text-[12px]">
             {workoutName} • {today}
           </Text>
 
@@ -82,11 +82,11 @@ export const ExerciseOverviewStep: React.FC<ExerciseOverviewStepProps> = ({
           activeOpacity={0.8}
           className="flex-row items-center justify-between bg-white/5 border border-white/10 px-4 py-3 rounded-2xl mb-4"
         >
-          <Text className="text-white/40 text-[10px] font-black uppercase tracking-widest">
+          <Text className="text-white/40 text-[12px] font-black uppercase tracking-widest">
             Currently working out?
           </Text>
           <View className="flex-row items-center gap-x-2">
-            <Text className={`text-[10px] font-bold uppercase ${isLive ? 'text-orange-500' : 'text-white/20'}`}>
+            <Text className={`text-[12px] font-bold uppercase ${isLive ? 'text-orange-500' : 'text-white/20'}`}>
               {isLive ? 'Live Session' : 'Manual Log'}
             </Text>
             <View className={`w-10 h-5 rounded-full px-1 justify-center ${isLive ? 'bg-orange-500' : 'bg-white/10'}`}>

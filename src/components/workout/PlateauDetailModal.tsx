@@ -64,9 +64,9 @@ export const PlateauDetailModal: React.FC<PlateauDetailModalProps> = ({
             {/* Table */}
             <View className="rounded-xl overflow-hidden border border-white/10 mb-6">
               <View className="flex-row bg-white/5 py-3 px-4">
-                <Text className="flex-1 text-white/40 text-[11px] font-bold uppercase tracking-widest">Date</Text>
-                <Text className="flex-1 text-white/40 text-[11px] font-bold uppercase tracking-widest text-center">Max Weight</Text>
-                <Text className="flex-1 text-white/40 text-[11px] font-bold uppercase tracking-widest text-center">Max Reps</Text>
+                <Text className="flex-1 text-white/40 text-[13px] font-bold uppercase tracking-widest">Date</Text>
+                <Text className="flex-1 text-white/40 text-[13px] font-bold uppercase tracking-widest text-center">Max Weight</Text>
+                <Text className="flex-1 text-white/40 text-[13px] font-bold uppercase tracking-widest text-center">Max Reps</Text>
               </View>
 
               {history.map((entry, index) => {

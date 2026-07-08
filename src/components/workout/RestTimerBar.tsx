@@ -57,7 +57,7 @@ export const RestTimerBar: React.FC<RestTimerBarProps> = ({
           />
         </View>
 
-        <Text className="text-white/40 text-[11px] mt-3 font-bold uppercase tracking-widest">
+        <Text className="text-white/40 text-[13px] mt-3 font-bold uppercase tracking-widest">
           Resting • {totalSeconds}s Total
         </Text>
       </View>

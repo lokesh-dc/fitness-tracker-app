@@ -61,26 +61,44 @@ function buildPayload(session: WorkoutSession): SaveWorkoutPayload {
     completedAt: completedAt.toISOString(),
     durationSeconds: Math.round((completedAt.getTime() - startedAt.getTime()) / 1000),
     exercises: session.exercises
-      .filter(ex => ex.isDone || ex.isSkipped)
-      .map(ex => ({
-        exerciseId: ex.exerciseId,
-        name: ex.name,
-        muscleGroup: ex.muscleGroup,
-        targetSets: ex.targetSets,
-        targetReps: ex.targetReps,
-        unit: ex.unit,
-        isDone: !!ex.isDone,
-        isSkipped: !!ex.isSkipped,
-        sets: ex.isSkipped 
-          ? [] 
-          : ex.sets
-              .filter(s => s.done && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
-              .map(s => ({
-                weight: parseFloat(s.weight),
-                reps: parseInt(s.reps),
-                done: true,
-              })),
-      }))
-      .filter(ex => ex.isSkipped || ex.sets.length > 0),
+      .map(ex => {
+        const hasValidSets = ex.sets.some(
+          s => parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
+        );
+        if (ex.isSkipped) {
+          return {
+            exerciseId: ex.exerciseId,
+            name: ex.name,
+            muscleGroup: ex.muscleGroup,
+            targetSets: ex.targetSets,
+            targetReps: ex.targetReps,
+            unit: ex.unit,
+            isDone: false,
+            isSkipped: true,
+            sets: [],
+          };
+        }
+        if (!hasValidSets && !ex.isDone) return null;
+        const validSets = ex.sets
+          .filter(s => parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
+          .map(s => ({
+            weight: parseFloat(s.weight),
+            reps: parseInt(s.reps),
+            done: s.done,
+          }));
+        if (validSets.length === 0) return null;
+        return {
+          exerciseId: ex.exerciseId,
+          name: ex.name,
+          muscleGroup: ex.muscleGroup,
+          targetSets: ex.targetSets,
+          targetReps: ex.targetReps,
+          unit: ex.unit,
+          isDone: true,
+          isSkipped: false,
+          sets: validSets,
+        };
+      })
+      .filter((ex): ex is NonNullable<typeof ex> => ex != null),
   };
 }

@@ -126,7 +126,7 @@ export default function SessionDetailScreen() {
                 {hadPR && (
                   <View className="flex-row items-center bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 ml-2">
                     <Ionicons name="trophy" size={12} color="#f97316" />
-                    <Text className="text-orange-500 text-[10px] font-bold ml-1">PR</Text>
+                    <Text className="text-orange-500 text-[12px] font-bold ml-1">PR</Text>
                   </View>
                 )}
               </View>
@@ -134,9 +134,9 @@ export default function SessionDetailScreen() {
               {/* Sets header */}
               {ex.sets.length > 0 && (
                 <View className="flex-row items-center px-1 mb-1">
-                  <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest flex-1">Set</Text>
-                  <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest w-20 text-right">Weight</Text>
-                  <Text className="text-white/30 text-[10px] font-bold uppercase tracking-widest w-16 text-right">Reps</Text>
+                  <Text className="text-white/30 text-[12px] font-bold uppercase tracking-widest flex-1">Set</Text>
+                  <Text className="text-white/30 text-[12px] font-bold uppercase tracking-widest w-20 text-right">Weight</Text>
+                  <Text className="text-white/30 text-[12px] font-bold uppercase tracking-widest w-16 text-right">Reps</Text>
                 </View>
               )}
 

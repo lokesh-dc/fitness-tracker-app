@@ -91,9 +91,9 @@ export default function HistoryScreen() {
     <View className="mt-1">
       {ex.sets.length > 0 && (
         <View className="flex-row items-center px-1 mb-1">
-          <Text className="text-white/20 text-[9px] font-bold uppercase tracking-widest flex-1">Set</Text>
-          <Text className="text-white/20 text-[9px] font-bold uppercase tracking-widest w-20 text-right">Weight</Text>
-          <Text className="text-white/20 text-[9px] font-bold uppercase tracking-widest w-16 text-right">Reps</Text>
+          <Text className="text-white/20 text-[11px] font-bold uppercase tracking-widest flex-1">Set</Text>
+          <Text className="text-white/20 text-[11px] font-bold uppercase tracking-widest w-20 text-right">Weight</Text>
+          <Text className="text-white/20 text-[11px] font-bold uppercase tracking-widest w-16 text-right">Reps</Text>
         </View>
       )}
       {ex.sets.map((set, setIdx) => {
@@ -179,7 +179,7 @@ export default function HistoryScreen() {
                 {hadPR && (
                   <View className="flex-row items-center bg-amber-500/10 border border-amber-500/20 rounded-full px-2 py-0.5 ml-2">
                     <Ionicons name="trophy" size={12} color="#f97316" />
-                    <Text className="text-orange-500 text-[10px] font-bold ml-1">PR</Text>
+                    <Text className="text-orange-500 text-[12px] font-bold ml-1">PR</Text>
                   </View>
                 )}
               </View>
@@ -238,7 +238,7 @@ export default function HistoryScreen() {
                     className="items-center justify-center px-[5px] py-2"
                     activeOpacity={0.6}
                   >
-                    <Text className="text-white/30 text-[9px] font-bold uppercase tracking-widest mb-1">
+                    <Text className="text-white/30 text-[11px] font-bold uppercase tracking-widest mb-1">
                       {new Date(currentMonth.year, currentMonth.month, day.date)
                         .toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2)}
                     </Text>
@@ -280,7 +280,7 @@ export default function HistoryScreen() {
       {loading && (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#f97316" />
-          <Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[10px]">
+          <Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[12px]">
             Loading sessions
           </Text>
         </View>

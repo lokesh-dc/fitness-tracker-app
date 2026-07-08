@@ -78,12 +78,12 @@ export default function NextWorkoutWidget({ data }: Props) {
               key={i}
               className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1"
             >
-              <Text className="text-white/50 text-[11px]">{name}</Text>
+              <Text className="text-white/50 text-[13px]">{name}</Text>
             </View>
           ))}
           {data.totalExercises > 3 && (
             <View className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1">
-              <Text className="text-white/30 text-[11px]">
+              <Text className="text-white/30 text-[13px]">
                 +{data.totalExercises - 3} more
               </Text>
             </View>

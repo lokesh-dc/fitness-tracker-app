@@ -50,7 +50,7 @@ export const WarmupBottomSheet: React.FC<WarmupBottomSheetProps> = ({
           <View className="flex-row items-center justify-between px-6 py-4">
             <View className="flex-row items-center gap-x-3">
               <View className={`${SCHEME_COLORS[warmup.scheme]} px-2 py-1 rounded`}>
-                <Text className="text-white text-[10px] font-black uppercase">
+                <Text className="text-white text-[12px] font-black uppercase">
                   {warmup.scheme.replace('_', ' ')}
                 </Text>
               </View>
@@ -79,10 +79,10 @@ export const WarmupBottomSheet: React.FC<WarmupBottomSheetProps> = ({
               <View className="rounded-2xl overflow-hidden border border-white/5">
                 {/* Table Header */}
                 <View className="flex-row bg-white/10 py-3 px-4">
-                  <Text className="w-8 text-white/40 text-[10px] font-black uppercase">#</Text>
-                  <Text className="flex-1 text-white/40 text-[10px] font-black uppercase text-center">Weight</Text>
-                  <Text className="flex-1 text-white/40 text-[10px] font-black uppercase text-center">Reps</Text>
-                  <Text className="w-12 text-white/40 text-[10px] font-black uppercase text-right">%</Text>
+                  <Text className="w-8 text-white/40 text-[12px] font-black uppercase">#</Text>
+                  <Text className="flex-1 text-white/40 text-[12px] font-black uppercase text-center">Weight</Text>
+                  <Text className="flex-1 text-white/40 text-[12px] font-black uppercase text-center">Reps</Text>
+                  <Text className="w-12 text-white/40 text-[12px] font-black uppercase text-right">%</Text>
                 </View>
 
                 {/* Table Rows */}
@@ -107,7 +107,7 @@ export const WarmupBottomSheet: React.FC<WarmupBottomSheetProps> = ({
             {/* Disclaimer */}
             <View className="flex-row items-center mt-6 bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
               <Feather name="alert-triangle" size={14} color="#f59e0b" />
-              <Text className="text-amber-500/80 text-[11px] ml-2 font-medium">
+              <Text className="text-amber-500/80 text-[13px] ml-2 font-medium">
                 Warmup sets are not saved to your log
               </Text>
             </View>

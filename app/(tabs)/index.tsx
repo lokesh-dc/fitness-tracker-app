@@ -11,7 +11,6 @@ import { useHomeData } from '@/hooks/useHomeData';
 import StreakWidget from '@/components/home/StreakWidget';
 import NextWorkoutWidget from '@/components/home/NextWorkoutWidget';
 import WeekSnapshotWidget from '@/components/home/WeekSnapshotWidget';
-import CalendarHeatmapWidget from '@/components/home/CalendarHeatmapWidget';
 
 export default function DashboardScreen() {
   const { user, token } = useAuth();
@@ -30,7 +29,7 @@ export default function DashboardScreen() {
       <SafeAreaView className="flex-1 bg-[#0a0a0a]" edges={['top']}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#f97316" />
-          <Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[10px]">
+          <Text className="text-white/40 mt-4 font-medium tracking-widest uppercase text-[12px]">
             Loading
           </Text>
         </View>
@@ -91,7 +90,7 @@ export default function DashboardScreen() {
             <Text className="text-white text-base font-semibold mt-2">
               Start
             </Text>
-            <Text className="text-white/60 text-[11px] mt-0.5">
+            <Text className="text-white/60 text-[13px] mt-0.5">
               Live session
             </Text>
           </TouchableOpacity>
@@ -104,7 +103,7 @@ export default function DashboardScreen() {
             <Text className="text-white text-base font-semibold mt-2">
               Log
             </Text>
-            <Text className="text-white/40 text-[11px] mt-0.5">
+            <Text className="text-white/40 text-[13px] mt-0.5">
               Past workout
             </Text>
           </TouchableOpacity>
@@ -122,9 +121,6 @@ export default function DashboardScreen() {
             <WeekSnapshotWidget data={data.weekSnapshot} />
           )}
 
-          {data?.monthDates && (
-            <CalendarHeatmapWidget monthDates={data.monthDates} />
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>

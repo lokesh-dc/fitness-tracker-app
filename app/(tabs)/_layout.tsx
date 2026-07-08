@@ -1,11 +1,14 @@
-import { Tabs } from "expo-router";
+import { Tabs, Redirect, useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
-import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, View, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CustomTabBar } from "@/components/CustomTabBar";
+import { ProfileIcon } from "@/components/TabIcons";
 
 export default function TabsLayout() {
 	const { user, isLoading } = useAuth();
+	const insets = useSafeAreaInsets();
+	const router = useRouter();
 
 	if (isLoading) {
 		return (
@@ -18,61 +21,40 @@ export default function TabsLayout() {
 	if (!user) return <Redirect href="/(auth)/login" />;
 
 	return (
-		<Tabs
-			screenOptions={{
-				headerShown: false,
-				tabBarStyle: {
-					backgroundColor: "#0a0a0a",
-					borderTopColor: "rgba(255,255,255,0.08)",
-				},
-				tabBarActiveTintColor: "#f97316",
-				tabBarInactiveTintColor: "rgba(255,255,255,0.4)",
-			}}>
-			<Tabs.Screen
-				name="index"
-				options={{
-					title: "Home",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="home-outline" size={size} color={color} />
-					),
+		<View className="flex-1">
+			<Tabs
+				screenOptions={{
+					headerShown: false,
 				}}
-			/>
-			<Tabs.Screen
-				name="history"
-				options={{
-					title: "History",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="time-outline" size={size} color={color} />
-					),
+				tabBar={(props) => <CustomTabBar {...props} />}>
+				<Tabs.Screen name="index" options={{ title: "Home" }} />
+				<Tabs.Screen name="history" options={{ title: "History" }} />
+				<Tabs.Screen name="plans" options={{ title: "Plans" }} />
+				<Tabs.Screen name="analytics" options={{ title: "Analytics" }} />
+				<Tabs.Screen
+					name="profile"
+					options={{ title: "Profile", tabBarButton: () => null }}
+				/>
+			</Tabs>
+
+			<TouchableOpacity
+				onPress={() => router.push("/(tabs)/profile")}
+				activeOpacity={0.7}
+				style={{
+					position: "absolute",
+					top: insets.top + 8,
+					right: 16,
+					width: 40,
+					height: 40,
+					borderRadius: 20,
+					backgroundColor: "rgba(255,255,255,0.08)",
+					alignItems: "center",
+					justifyContent: "center",
+					zIndex: 50,
 				}}
-			/>
-			<Tabs.Screen
-				name="plans"
-				options={{
-					title: "Plans",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="list-outline" size={size} color={color} />
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="analytics"
-				options={{
-					title: "Analytics",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="stats-chart-outline" size={size} color={color} />
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="profile"
-				options={{
-					title: "Profile",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="person-outline" size={size} color={color} />
-					),
-				}}
-			/>
-		</Tabs>
+			>
+				<ProfileIcon color="#fff" size={22} />
+			</TouchableOpacity>
+		</View>
 	);
 }

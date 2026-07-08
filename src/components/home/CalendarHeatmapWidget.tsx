@@ -43,7 +43,7 @@ export default function CalendarHeatmapWidget({ monthDates }: Props) {
       <View className="flex-row mb-2">
         {DAY_HEADERS.map((label, i) => (
           <View key={i} className="flex-1 items-center">
-            <Text className="text-white/20 text-[9px] font-bold uppercase tracking-wider">
+            <Text className="text-white/20 text-[11px] font-bold uppercase tracking-wider">
               {label}
             </Text>
           </View>

@@ -35,7 +35,7 @@ export default function WeekSnapshotWidget({ data }: Props) {
           const isPlanned = data.plannedDays.includes(i);
           return (
             <View key={i} className="flex-1 items-center">
-              <Text className="text-white/30 text-[9px] font-bold uppercase tracking-wider mb-1">
+              <Text className="text-white/30 text-[11px] font-bold uppercase tracking-wider mb-1">
                 {label}
               </Text>
               <View

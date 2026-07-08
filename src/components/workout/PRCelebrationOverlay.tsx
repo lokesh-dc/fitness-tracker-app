@@ -54,21 +54,21 @@ export const PRCelebrationOverlay: React.FC<PRCelebrationOverlayProps> = ({ pr }
           transform: [{ scale: scaleAnim }]
         }}
       >
-        <Text style={{ fontSize: 72, marginBottom: 24 }}>🏆</Text>
+        <Text style={{ fontSize: 74, marginBottom: 24 }}>🏆</Text>
         
-        <Text className="text-orange-500 font-bold mb-4 text-center tracking-[4px]" style={{ fontSize: 36 }}>
+        <Text className="text-orange-500 font-bold mb-4 text-center tracking-[4px]" style={{ fontSize: 38 }}>
           NEW PR!
         </Text>
         
-        <Text className="text-white/80 mb-8 text-center" style={{ fontSize: 20 }}>
+        <Text className="text-white/80 mb-8 text-center" style={{ fontSize: 22 }}>
           {pr.exerciseName}
         </Text>
         
-        <Text className="text-white font-bold mb-4 text-center" style={{ fontSize: 32 }}>
+        <Text className="text-white font-bold mb-4 text-center" style={{ fontSize: 34 }}>
           {prValueText}
         </Text>
         
-        <Text className="text-white/40 text-center" style={{ fontSize: 14 }}>
+        <Text className="text-white/40 text-center" style={{ fontSize: 16 }}>
           {previousBestText}
         </Text>
       </Animated.View>
